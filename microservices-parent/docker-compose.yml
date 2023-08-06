@@ -1,0 +1,182 @@
+---
+version: '3'
+services:
+  ## Postgres Docker Compose Config
+  postgres-vuln:
+    container_name: postgres-vuln
+    image: postgres:15
+    environment:
+      POSTGRES_DB: vuln-service
+      POSTGRES_USER: vulnadmin
+      POSTGRES_PASSWORD: vulnpwd
+      PGDATA: /data/postgres
+    volumes:
+      - ./postgres-vuln:/data/postgres
+    expose:
+      - "5432"
+    ports:
+      - "5432:5432"
+    command: -p 5432
+    restart: always
+
+  ## pgadmin interface for vuln-service
+  vuln-pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
+
+  ## MongoDB config for project-service
+  mongo-project:
+    container_name: mongo
+    image: mongo
+    restart: always
+    expose:
+      - "27017"
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo-project:/data/db
+
+  ## MySQL config for keycloak auth-service realm
+  mysql-keycloak:
+    container_name: mysql-keycloak
+    image: mysql:8.0
+    volumes:
+      - ./mysql_keycloak_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: keycloakpassword
+
+  ## Keycloak auth-service realm config
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:22.0.0
+    command: [ "start-dev", "--import-realm"]
+    environment:
+      DB_VENDOR: MYSQL
+      DB_ADDR: mysql
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: keycloakpassword
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HTTP_PORT: 8181
+    ports:
+      - "8181:8181"
+    volumes:
+      - ./realms/:/opt/keycloak/data/import
+    depends_on:
+      - mysql-keycloak
+
+  ## Zookeeper and Kafka Config
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.2
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  broker:
+    image: confluentinc/cp-kafka:7.3.2
+    container_name: broker
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+  ## Zipkin for distributed tracing
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+
+  ## Eureka Server Config
+  eureka-server:
+    image: agrainger14/eureka-server:latest
+    container_name: eureka-server
+    pull_policy: always
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  ## Api-gateway Config
+  api-gateway:
+    image: agrainger14/api-gateway:latest
+    container_name: api-gateway
+    pull_policy: always
+    expose:
+      - "8080"
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - eureka-server
+
+  ## Project-service config
+  project-service:
+    image: agrainger14/project-service:latest
+    container_name: project-service
+    pull_policy: always
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - eureka-server
+      - api-gateway
+      - mongo-project
+      - broker
+      - keycloak
+
+  ## Vuln-service config
+  vuln-service:
+    image: agrainger14/vuln-service:latest
+    container_name: vuln-service
+    pull_policy: always
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - eureka-server
+      - api-gateway
+      - postgres-vuln
+      - vuln-pgadmin
+      - broker
+
+  ## Upload-service config
+  upload-service:
+    image: agrainger14/upload-service:latest
+    container_name: upload-service
+    pull_policy: always
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - eureka-server
+      - api-gateway
+
+  ## Notification-service config
+  notification-service:
+    image: agrainger14/notification-service:latest
+    container_name: notification-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    pull_policy: always
+    depends_on:
+      - eureka-server
+      - broker
+      - api-gateway

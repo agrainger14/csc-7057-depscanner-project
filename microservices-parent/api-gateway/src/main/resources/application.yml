@@ -1,0 +1,79 @@
+server:
+  port: 8080
+  forward-headers-strategy: framework
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    preferIpAddress: true
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n"
+  level:
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.http.server.reactive: TRACE
+
+spring:
+  output:
+    ansi:
+      enabled: always
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:5173"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+      routes:
+        - id: project-service
+          uri: lb://project-service
+          predicates:
+            - Path=/project/**
+          filters:
+            - RewritePath=/project/(?<path>.*), /$\{path}
+        - id: upload-service
+          uri: lb://upload-service
+          predicates:
+            - Path=/upload/**
+          filters:
+            - RewritePath=/upload/(?<path>.*), /$\{path}
+        - id: vuln-service
+          uri: lb://vuln-service
+          predicates:
+            - Path=/vuln/**
+          filters:
+            - RewritePath=/vuln/(?<path>.*), /$\{path}
+        - id: openapi
+          uri: http://localhost:${server.port}
+          predicates:
+            - Path=/v3/api-docs/**
+          filters:
+            - RewritePath=/v3/api-docs/(?<path>.*), /$\{path}/v3/api-docs
+
+springdoc:
+  swagger-ui:
+    use-root-path: true
+    urls:
+      - name: project
+        url: /v3/api-docs/project
+      - name: upload
+        url: /v3/api-docs/upload
+      - name: vuln
+        url: /v3/api-docs/vuln
+  cache:
+    disabled: true
