@@ -7,6 +7,7 @@ import com.depscanner.uploadservice.model.entity.DependencyEntity;
 import com.depscanner.uploadservice.model.enumeration.BuildToolType;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.jupiter.api.Assertions;
@@ -14,19 +15,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 public class MavenParserTest {
@@ -42,6 +42,15 @@ public class MavenParserTest {
     }
 
     @Test
+    void buildValidMavenLookupUrl() {
+        String groupId = "com.test";
+        String artifactId = "my-dependency";
+        String version = "1.0.0";
+        String apiUrl = mavenParser.buildApiUrl(groupId, artifactId, version);
+        assertEquals("https://repo1.maven.org/maven2/com/test/my-dependency/1.0.0/my-dependency-1.0.0.pom", apiUrl);
+    }
+
+    @Test
     void getBuildToolTypeReturnsMaven() {
         BuildToolType buildToolType = mavenParser.getBuildToolType();
         Assertions.assertEquals(BuildToolType.MAVEN, buildToolType);
@@ -50,7 +59,6 @@ public class MavenParserTest {
     @Test
     void getParsedModelModelMapContainsModelReturnsModelFromMap() {
         Model model = new Model();
-
         Map<String, Model> modelMap = Collections.singletonMap(Constant.MAVEN_REPO_URL, model);
         mavenParser = new MavenParser(reader, modelMap);
         Model parsedModel = mavenParser.getParsedModel(Constant.MAVEN_REPO_URL);
@@ -60,26 +68,43 @@ public class MavenParserTest {
     @Test
     void parseMavenDependenciesReturnsDependencyEntities() {
         Model model = new Model();
+
+        Parent parent = new Parent();
+        parent.setGroupId("com.test");
+        parent.setArtifactId("test-artifact");
+        parent.setVersion("1.0.0");
+        model.setParent(parent);
+
         Dependency dependency1 = new Dependency();
-        dependency1.setGroupId("com.example");
-        dependency1.setArtifactId("example-artifact");
+        dependency1.setGroupId("com.test");
+        dependency1.setArtifactId("test-artifact");
         dependency1.setVersion("1.0.0");
 
         Dependency dependency2 = new Dependency();
-        dependency2.setGroupId("com.example");
-        dependency2.setArtifactId("another-artifact");
+        dependency2.setGroupId("com.test");
+        dependency2.setArtifactId("another-test");
         dependency2.setVersion("2.0.0");
 
         model.setDependencies(Arrays.asList(dependency1, dependency2));
 
         Set<DependencyEntity> dependencies = mavenParser.parseMavenDependencies(model);
+
+        assertNotNull(dependencies);
+        assertEquals(2, dependencies.size());
     }
 
     @Test
     void analyseFileValidPomXmlReturnsDependencyEntities() throws IOException, XmlPullParserException {
         MultipartFile file = mock(MultipartFile.class);
         InputStream inputStream = mock(InputStream.class);
+
+        Parent parent = new Parent();
+        parent.setGroupId("com.example");
+        parent.setArtifactId("parent-artifact");
+        parent.setVersion("1.0.0");
+
         Model model = new Model();
+        model.setParent(parent);
         Dependency dependency = new Dependency();
         dependency.setGroupId("com.example");
         dependency.setArtifactId("example-artifact");
@@ -90,6 +115,9 @@ public class MavenParserTest {
         when(reader.read(inputStream)).thenReturn(model);
 
         Set<DependencyEntity> dependencies = mavenParser.analyseFile(file);
+
+        assertNotNull(dependencies);
+        assertEquals(1, dependencies.size());
     }
 
     @Test
@@ -154,12 +182,19 @@ public class MavenParserTest {
         Dependency dependency = new Dependency();
         dependency.setGroupId("group1");
         dependency.setArtifactId("artifact1");
-        dependency.setVersion("${version.placeholder}");
+        dependency.setVersion("${unresolved.version}");
 
         Model model = mock(Model.class);
-        when(model.getDependencies()).thenReturn(List.of(dependency));
+        when(model.getDependencies()).thenReturn(Collections.singletonList(dependency));
+        when(model.getProperties()).thenReturn(new Properties());
 
         Set<DependencyEntity> result = mavenParser.parseMavenDependencies(model);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+
+        DependencyEntity entity = result.iterator().next();
+        assertNull(entity.getVersion());
     }
 
     @Test

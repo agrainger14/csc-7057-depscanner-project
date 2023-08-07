@@ -15,7 +15,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -50,7 +51,7 @@ public class NpmParserTest {
         Assertions.assertEquals(dependencyName, dependencyEntity.getName());
         Assertions.assertEquals(version, dependencyEntity.getVersion());
         Assertions.assertEquals(BuildToolType.NPM, dependencyEntity.getSystem());
-        Assertions.assertEquals(isDevDependency, dependencyEntity.isDevDependency());
+        Assertions.assertEquals(isDevDependency, dependencyEntity.getIsDevDependency());
     }
 
     @Test
@@ -58,28 +59,27 @@ public class NpmParserTest {
         String fileContents = "{\"dependencies\":{\"dependency1\":\"1.0.0\",\"dependency2\":\"^2.0.0\"}}";
         when(multipartFile.getBytes()).thenReturn(fileContents.getBytes());
 
-        List<DependencyEntity> dependencyEntities = npmParser.analyseFile(multipartFile);
+        Set<DependencyEntity> expectedDependencies = new HashSet<>();
 
-        assertEquals(2, dependencyEntities.size());
+        DependencyEntity dependency1 = new DependencyEntity("dependency1", "1.0.0", BuildToolType.NPM, false);
+        DependencyEntity dependency2 = new DependencyEntity("dependency2", "2.0.0", BuildToolType.NPM, false);
 
-        DependencyEntity dependency1 = dependencyEntities.get(0);
-        Assertions.assertEquals("dependency1", dependency1.getName());
-        Assertions.assertEquals("1.0.0", dependency1.getVersion());
-        Assertions.assertEquals(BuildToolType.NPM, dependency1.getSystem());
-        Assertions.assertFalse(dependency1.isDevDependency());
+        expectedDependencies.add(dependency1);
+        expectedDependencies.add(dependency2);
 
-        DependencyEntity dependency2 = dependencyEntities.get(1);
-        Assertions.assertEquals("dependency2", dependency2.getName());
-        Assertions.assertEquals("2.0.0", dependency2.getVersion());
-        Assertions.assertEquals(BuildToolType.NPM, dependency2.getSystem());
-        Assertions.assertFalse(dependency2.isDevDependency());
+        Set<DependencyEntity> dependencyEntities = npmParser.analyseFile(multipartFile);
+
+        assertEquals(expectedDependencies.size(), dependencyEntities.size());
+
+        for (DependencyEntity expectedDependency : expectedDependencies) {
+            assertTrue(dependencyEntities.contains(expectedDependency));
+        }
     }
 
     @Test
     void testBuildNPMDependencyWithNullDependencyName() {
         String version = "1.0.0";
         boolean isDevDependency = false;
-
         assertThrows(NullPointerException.class, () -> npmParser.buildNPMDependency(null, version, isDevDependency));
     }
 
@@ -126,26 +126,18 @@ public class NpmParserTest {
 
         when(multipartFile.getBytes()).thenReturn(packageJson.toString().getBytes());
 
-        List<DependencyEntity> dependencyEntities = npmParser.analyseFile(multipartFile);
-        assertEquals(3, dependencyEntities.size());
+        Set<DependencyEntity> expectedDependencies = new HashSet<>();
+        expectedDependencies.add(new DependencyEntity("dependency1", "1.0.0", BuildToolType.NPM, false));
+        expectedDependencies.add(new DependencyEntity("dependency2", "2.0.0", BuildToolType.NPM, false));
+        expectedDependencies.add(new DependencyEntity("dependency3", "3.0.0", BuildToolType.NPM, true));
 
-        DependencyEntity dependency1 = dependencyEntities.get(0);
-        Assertions.assertEquals("dependency1", dependency1.getName());
-        Assertions.assertEquals("1.0.0", dependency1.getVersion());
-        Assertions.assertEquals(BuildToolType.NPM, dependency1.getSystem());
-        Assertions.assertFalse(dependency1.isDevDependency());
+        Set<DependencyEntity> dependencyEntities = npmParser.analyseFile(multipartFile);
 
-        DependencyEntity dependency2 = dependencyEntities.get(1);
-        Assertions.assertEquals("dependency2", dependency2.getName());
-        Assertions.assertEquals("2.0.0", dependency2.getVersion());
-        Assertions.assertEquals(BuildToolType.NPM, dependency2.getSystem());
-        Assertions.assertFalse(dependency2.isDevDependency());
+        assertEquals(expectedDependencies.size(), dependencyEntities.size());
 
-        DependencyEntity dependency3 = dependencyEntities.get(2);
-        Assertions.assertEquals("dependency3", dependency3.getName());
-        Assertions.assertEquals("3.0.0", dependency3.getVersion());
-        Assertions.assertEquals(BuildToolType.NPM, dependency3.getSystem());
-        Assertions.assertTrue(dependency3.isDevDependency());
+        for (DependencyEntity expectedDependency : expectedDependencies) {
+            assertTrue(dependencyEntities.contains(expectedDependency));
+        }
     }
 
     @Test
@@ -153,7 +145,7 @@ public class NpmParserTest {
         String fileContents = "{}";
         when(multipartFile.getBytes()).thenReturn(fileContents.getBytes());
 
-        List<DependencyEntity> dependencyEntities = npmParser.analyseFile(multipartFile);
+        Set<DependencyEntity> dependencyEntities = npmParser.analyseFile(multipartFile);
 
         assertEquals(0, dependencyEntities.size());
     }
@@ -163,15 +155,16 @@ public class NpmParserTest {
         String fileContents = "{\"dependencies\":{\"dependency1\":\"^1.0.0\"}}";
         when(multipartFile.getBytes()).thenReturn(fileContents.getBytes());
 
-        List<DependencyEntity> dependencyEntities = npmParser.analyseFile(multipartFile);
+        Set<DependencyEntity> expectedDependencies = new HashSet<>();
+        expectedDependencies.add(new DependencyEntity("dependency1", "1.0.0", BuildToolType.NPM, false));
 
-        assertEquals(1, dependencyEntities.size());
+        Set<DependencyEntity> dependencyEntities = npmParser.analyseFile(multipartFile);
 
-        DependencyEntity dependency1 = dependencyEntities.get(0);
-        Assertions.assertEquals("dependency1", dependency1.getName());
-        Assertions.assertEquals("1.0.0", dependency1.getVersion());
-        Assertions.assertEquals(BuildToolType.NPM, dependency1.getSystem());
-        Assertions.assertFalse(dependency1.isDevDependency());
+        assertEquals(expectedDependencies.size(), dependencyEntities.size());
+
+        for (DependencyEntity expectedDependency : expectedDependencies) {
+            assertTrue(dependencyEntities.contains(expectedDependency));
+        }
     }
 
     @Test
@@ -179,7 +172,7 @@ public class NpmParserTest {
         String fileContents = "{}";
         when(multipartFile.getBytes()).thenReturn(fileContents.getBytes());
 
-        List<DependencyEntity> dependencyEntities = npmParser.analyseFile(multipartFile);
+        Set<DependencyEntity> dependencyEntities = npmParser.analyseFile(multipartFile);
 
         assertTrue(dependencyEntities.isEmpty());
     }
@@ -189,14 +182,16 @@ public class NpmParserTest {
         String fileContents = "{\"dependencies\":{\"dependency1\":\"1.0.0\"}}";
         when(multipartFile.getBytes()).thenReturn(fileContents.getBytes());
 
-        List<DependencyEntity> dependencyEntities = npmParser.analyseFile(multipartFile);
+        Set<DependencyEntity> expectedDependencies = new HashSet<>();
+        expectedDependencies.add(new DependencyEntity("dependency1", "1.0.0", BuildToolType.NPM, false));
 
-        assertEquals(1, dependencyEntities.size());
-        DependencyEntity dependency1 = dependencyEntities.get(0);
-        Assertions.assertEquals("dependency1", dependency1.getName());
-        Assertions.assertEquals("1.0.0", dependency1.getVersion());
-        Assertions.assertEquals(BuildToolType.NPM, dependency1.getSystem());
-        Assertions.assertFalse(dependency1.isDevDependency());
+        Set<DependencyEntity> dependencyEntities = npmParser.analyseFile(multipartFile);
+
+        assertEquals(expectedDependencies.size(), dependencyEntities.size());
+
+        for (DependencyEntity expectedDependency : expectedDependencies) {
+            assertTrue(dependencyEntities.contains(expectedDependency));
+        }
     }
 
     @Test
@@ -204,36 +199,37 @@ public class NpmParserTest {
         String fileContents = "{\"devDependencies\":{\"dependency1\":\"1.0.0\",\"dependency2\":\"2.0.0\"}}";
         when(multipartFile.getBytes()).thenReturn(fileContents.getBytes());
 
-        List<DependencyEntity> dependencyEntities = npmParser.analyseFile(multipartFile);
+        Set<DependencyEntity> expectedDependencies = new HashSet<>();
+        expectedDependencies.add(new DependencyEntity("dependency1", "1.0.0", BuildToolType.NPM, true));
+        expectedDependencies.add(new DependencyEntity("dependency2", "2.0.0", BuildToolType.NPM, true));
 
-        assertEquals(2, dependencyEntities.size());
-        DependencyEntity dependency1 = dependencyEntities.get(0);
-        Assertions.assertEquals("dependency1", dependency1.getName());
-        Assertions.assertEquals("1.0.0", dependency1.getVersion());
-        Assertions.assertEquals(BuildToolType.NPM, dependency1.getSystem());
-        Assertions.assertTrue(dependency1.isDevDependency());
+        Set<DependencyEntity> dependencyEntities = npmParser.analyseFile(multipartFile);
 
-        DependencyEntity dependency2 = dependencyEntities.get(1);
-        Assertions.assertEquals("dependency2", dependency2.getName());
-        Assertions.assertEquals("2.0.0", dependency2.getVersion());
-        Assertions.assertEquals(BuildToolType.NPM, dependency2.getSystem());
-        Assertions.assertTrue(dependency2.isDevDependency());
+        assertEquals(expectedDependencies.size(), dependencyEntities.size());
+
+        for (DependencyEntity expectedDependency : expectedDependencies) {
+            assertTrue(dependencyEntities.contains(expectedDependency));
+        }
     }
+
 
     @Test
     void testAnalyseFileWithVersionPrefix() throws IOException {
         String fileContents = "{\"dependencies\":{\"dependency1\":\"~1.0.0\"}}";
         when(multipartFile.getBytes()).thenReturn(fileContents.getBytes());
 
-        List<DependencyEntity> dependencyEntities = npmParser.analyseFile(multipartFile);
+        Set<DependencyEntity> expectedDependencies = new HashSet<>();
+        expectedDependencies.add(new DependencyEntity("dependency1", "1.0.0", BuildToolType.NPM, false));
 
-        assertEquals(1, dependencyEntities.size());
-        DependencyEntity dependency1 = dependencyEntities.get(0);
-        Assertions.assertEquals("dependency1", dependency1.getName());
-        Assertions.assertEquals("1.0.0", dependency1.getVersion());
-        Assertions.assertEquals(BuildToolType.NPM, dependency1.getSystem());
-        Assertions.assertFalse(dependency1.isDevDependency());
+        Set<DependencyEntity> dependencyEntities = npmParser.analyseFile(multipartFile);
+
+        assertEquals(expectedDependencies.size(), dependencyEntities.size());
+
+        for (DependencyEntity expectedDependency : expectedDependencies) {
+            assertTrue(dependencyEntities.contains(expectedDependency));
+        }
     }
+
 
     @Test
     void testAnalyseFileWithEmptyFile() {
@@ -246,7 +242,7 @@ public class NpmParserTest {
         String fileContents = "{\"name\":\"project-name\",\"version\":\"1.0.0\"}";
         when(multipartFile.getBytes()).thenReturn(fileContents.getBytes());
 
-        List<DependencyEntity> dependencyEntities = npmParser.analyseFile(multipartFile);
+        Set<DependencyEntity> dependencyEntities = npmParser.analyseFile(multipartFile);
 
         assertTrue(dependencyEntities.isEmpty());
     }
@@ -256,21 +252,19 @@ public class NpmParserTest {
         String fileContents = "{\"dependencies\":{\"dependency1\":\"1.0.0\"},\"devDependencies\":{\"dependency2\":\"2.0.0\"}}";
         when(multipartFile.getBytes()).thenReturn(fileContents.getBytes());
 
-        List<DependencyEntity> dependencyEntities = npmParser.analyseFile(multipartFile);
+        Set<DependencyEntity> expectedDependencies = new HashSet<>();
+        expectedDependencies.add(new DependencyEntity("dependency1", "1.0.0", BuildToolType.NPM, false));
+        expectedDependencies.add(new DependencyEntity("dependency2", "2.0.0", BuildToolType.NPM, true));
 
-        assertEquals(2, dependencyEntities.size());
-        DependencyEntity dependency1 = dependencyEntities.get(0);
-        Assertions.assertEquals("dependency1", dependency1.getName());
-        Assertions.assertEquals("1.0.0", dependency1.getVersion());
-        Assertions.assertEquals(BuildToolType.NPM, dependency1.getSystem());
-        Assertions.assertFalse(dependency1.isDevDependency());
+        Set<DependencyEntity> dependencyEntities = npmParser.analyseFile(multipartFile);
 
-        DependencyEntity dependency2 = dependencyEntities.get(1);
-        Assertions.assertEquals("dependency2", dependency2.getName());
-        Assertions.assertEquals("2.0.0", dependency2.getVersion());
-        Assertions.assertEquals(BuildToolType.NPM, dependency2.getSystem());
-        Assertions.assertTrue(dependency2.isDevDependency());
+        assertEquals(expectedDependencies.size(), dependencyEntities.size());
+
+        for (DependencyEntity expectedDependency : expectedDependencies) {
+            assertTrue(dependencyEntities.contains(expectedDependency));
+        }
     }
+
 
     @Test
     void testBuildNPMDependencyWithTrimmedVersion() {
@@ -295,7 +289,6 @@ public class NpmParserTest {
     @Test
     void testAnalyseFileWithIOException() throws IOException {
         when(multipartFile.getBytes()).thenThrow(IOException.class);
-
         assertThrows(RuntimeException.class, () -> npmParser.analyseFile(multipartFile));
     }
 }
