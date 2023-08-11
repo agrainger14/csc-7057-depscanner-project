@@ -7,9 +7,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Set;
 
 /**
- * The BuildToolAnalyser Interface defines the contract used by parsers to implement core functionality.
+ * The BuildToolParser Interface defines the contract used by parsers to implement core functionality.
  */
-public interface BuildToolAnalyser {
+public interface BuildToolParser {
     /**
      * Used to analyse the uploaded file and returns a list of the parsed dependency entities
      *

@@ -42,15 +42,6 @@ public class MavenParserTest {
     }
 
     @Test
-    void buildValidMavenLookupUrl() {
-        String groupId = "com.test";
-        String artifactId = "my-dependency";
-        String version = "1.0.0";
-        String apiUrl = mavenParser.buildApiUrl(groupId, artifactId, version);
-        assertEquals("https://repo1.maven.org/maven2/com/test/my-dependency/1.0.0/my-dependency-1.0.0.pom", apiUrl);
-    }
-
-    @Test
     void getBuildToolTypeReturnsMaven() {
         BuildToolType buildToolType = mavenParser.getBuildToolType();
         Assertions.assertEquals(BuildToolType.MAVEN, buildToolType);

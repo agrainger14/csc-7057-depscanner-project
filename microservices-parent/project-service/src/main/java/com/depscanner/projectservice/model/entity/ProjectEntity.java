@@ -30,4 +30,7 @@ public class ProjectEntity {
     private int projectDependenciesCount;
     private List<DependencyEntity> dependencies;
 
+    private boolean isDailyScanned;
+    private boolean isWeeklyScanned;
+
 }

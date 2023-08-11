@@ -11,18 +11,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
- * A component that implements the BuildToolAnalyser interface to parse NPM package.json files
+ * A component that implements the BuildToolParser interface to parse NPM package.json files
  * and extract the dependencies and devDependencies listed in them.
  * It converts the parsed dependencies into DependencyEntity objects to be associated to a user project if required.
  */
 @Component
-public class NpmParser implements BuildToolAnalyser {
+public class NpmParser implements BuildToolParser {
 
     /**
      * Parses the provided NPM package.json file and extracts dependencies and labels devDependencies.

@@ -6,11 +6,9 @@ import com.depscanner.projectservice.exception.*;
 import com.depscanner.projectservice.model.data.dto.DependencyDto;
 import com.depscanner.projectservice.model.data.request.DependencyRequest;
 import com.depscanner.projectservice.model.data.request.ProjectRequest;
-import com.depscanner.projectservice.model.data.response.DeleteResponse;
-import com.depscanner.projectservice.model.data.response.DependencyResponse;
-import com.depscanner.projectservice.model.data.response.ProjectResponse;
+import com.depscanner.projectservice.model.data.request.ScanUpdateRequest;
+import com.depscanner.projectservice.model.data.response.*;
 import com.depscanner.projectservice.event.VulnScanEvent;
-import com.depscanner.projectservice.model.data.response.UserProjectResponse;
 import com.depscanner.projectservice.model.enumeration.ProjectType;
 import com.depscanner.projectservice.repository.ProjectRepository;
 import com.depscanner.projectservice.model.entity.DependencyEntity;
@@ -35,7 +33,6 @@ import java.util.stream.Collectors;
 @Transactional
 @Slf4j
 public class ProjectService {
-
     private final AuthService authService;
     private final ProjectRepository projectRepository;
     private final ModelMapper modelMapper;
@@ -43,7 +40,6 @@ public class ProjectService {
     private final Tracer tracer;
 
     private final KafkaTemplate<String, VulnScanEvent> kafkaTemplate;
-
 
     /**
      * Retrieves a list of projects associated with the given user's email.
@@ -64,6 +60,8 @@ public class ProjectService {
                         .createdAt(userProject.getCreatedAt())
                         .description(userProject.getDescription())
                         .projectType(userProject.getProjectType())
+                        .isDailyScanned(userProject.isDailyScanned())
+                        .isWeeklyScanned(userProject.isWeeklyScanned())
                         .projectDependenciesCount(userProject.getProjectDependenciesCount())
                         .dependencies(userProject.getDependencies()
                                 .stream().
@@ -165,10 +163,12 @@ public class ProjectService {
      * @return The ProjectResponse object representing the newly created project.
      */
     public UserProjectResponse createUserProject(ProjectRequest projectRequest) {
+        String userEmail = authService.getAuthEmail();
+
         //model mapper prevents some unneeded map methods
         ProjectEntity project = modelMapper.map(projectRequest, ProjectEntity.class);
 
-        project.setEmail(authService.getAuthEmail());
+        project.setEmail(userEmail);
         project.setProjectType(ProjectType.fromSystem(projectRequest.getDependencies().get(0).getSystem()));
         project.setProjectDependenciesCount(projectRequest.getDependencies().size());
 
@@ -189,7 +189,7 @@ public class ProjectService {
                     .map(dependency -> modelMapper.map(dependency, DependencyDto.class))
                     .toList();
 
-            VulnScanEvent vulnScanEvent = new VulnScanEvent(authService.getAuthEmail(), modelMapper.map(project, ProjectResponse.class), dependencyList);
+            VulnScanEvent vulnScanEvent = new VulnScanEvent(userEmail, modelMapper.map(project, ProjectResponse.class), dependencyList);
             kafkaTemplate.send("project-vuln-scan-topic", vulnScanEvent);
         }
 
@@ -202,73 +202,31 @@ public class ProjectService {
         return userProjectResponse;
     }
 
-    /**
-     * Updates the version of a project dependency associated with the given user's email.
-     *
-     * @param projectId     The ID of the project containing the dependency to update.
-     * @param dependencyId  The ID of the dependency to update.
-     * @param version       The new version of the dependency.
-     * @return The updated DependencyDto object representing the updated dependency.
-     * @throws NoProjectByIdException        If no project is found with the given ID.
-     * @throws NoDependencyByIdException     If no dependency is found with the given ID.
-     * @throws UserNotAuthorisedException    If the user is not authorised to access this project.
-     * @throws NoProjectDependenciesException If the project has no dependencies.
-     */
-    public DependencyDto updateProjectDependencyVersion(String projectId, String dependencyId, String version) {
-        ProjectEntity project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new NoProjectByIdException("Project by that ID does not exist!") );
 
-        emailAuthorisationCheck(project);
+    public ScanUpdateResponse updateProjectScheduledScan(String projectId, ScanUpdateRequest scanUpdateRequest) {
+        Optional<ProjectEntity> userProjectOptional = projectRepository.findById(projectId);
+        boolean newWeeklyScanned = scanUpdateRequest.isWeeklyScanned();
+        boolean newDailyScanned = scanUpdateRequest.isDailyScanned();
 
-        if (project.getDependencies().isEmpty()) {
-            throw new NoProjectDependenciesException("No project dependencies exist!");
+        if (userProjectOptional.isEmpty()) {
+            throw new NoUserProjectsException("No project found by that ID");
         }
 
-        List<DependencyEntity> dependencyEntities = project.getDependencies();
+        ProjectEntity userProject = userProjectOptional.get();
 
-        DependencyEntity dependencyToUpdate = dependencyEntities.stream()
-                .filter(dependency -> dependency.getId().equals(dependencyId))
-                .findFirst()
-                .orElseThrow(() -> new NoDependencyByIdException("Dependency by that ID does not exist!"));
-
-        dependencyToUpdate.setVersion(version);
-        projectRepository.save(project);
-
-        return modelMapper.map(dependencyToUpdate, DependencyDto.class);
-    }
-
-    /**
-     * Updates the list of dependencies for a project associated with the given user's email.
-     *
-     * @param projectId     The ID of the project to update.
-     * @param dependencies  The list of DependencyRequest objects representing the new dependencies.
-     * @return The updated ProjectResponse object representing the project with new dependencies.
-     * @throws NoProjectByIdException        If no project is found with the given ID.
-     * @throws UserNotAuthorisedException    If the user is not authorised to access this project.
-     * @throws NoProjectDependenciesException If the project has no dependencies.
-     */
-    public ProjectResponse updateProjectDependencies(String projectId, List<DependencyRequest> dependencies) {
-        ProjectEntity project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new NoProjectByIdException("Project by that ID does not exist!") );
-
-        emailAuthorisationCheck(project);
-
-        if (project.getDependencies().isEmpty()) {
-            throw new NoProjectDependenciesException("No project dependencies exist!");
+        if (newWeeklyScanned) {
+            newDailyScanned = false;
         }
 
-        project.getDependencies().clear();
-        project.setDependencies(dependencies
-                .stream()
-                .map(dependency -> {
-                    DependencyEntity dependencyEntity = modelMapper.map(dependency, DependencyEntity.class);
-                    dependencyEntity.setId(UUID.randomUUID().toString());
-                    return dependencyEntity;
-                })
-                .toList());
+        if (newDailyScanned) {
+            newWeeklyScanned = false;
+        }
 
-        projectRepository.save(project);
-        return modelMapper.map(project, ProjectResponse.class);
+        userProject.setWeeklyScanned(newWeeklyScanned);
+        userProject.setDailyScanned(newDailyScanned);
+
+        projectRepository.save(userProject);
+        return modelMapper.map(userProject, ScanUpdateResponse.class);
     }
 
     /**
@@ -322,18 +280,6 @@ public class ProjectService {
                 .success(true)
                 .message("Project successfully deleted")
                 .build();
-    }
-
-    /**
-     * Retrieves a list of all projects available in the database.
-     *
-     * @return A list of ProjectResponse objects representing all projects.
-     */
-    public List<ProjectResponse> getAllProjects() {
-        return projectRepository.findAll()
-                .stream()
-                .map(project -> modelMapper.map(project, ProjectResponse.class))
-                .toList();
     }
 
     /**

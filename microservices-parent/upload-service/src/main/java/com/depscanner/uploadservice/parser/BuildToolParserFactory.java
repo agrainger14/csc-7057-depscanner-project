@@ -14,33 +14,33 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * The BuildToolAnalyserFactory class is responsible for creating and managing instances of BuildToolAnalyser based on
+ * The BuildToolParserFactory class is responsible for creating and managing instances of BuildToolParser based on
  * the provided BuildToolType. It also contains a method to check the type of the build tool based on the file's
  * extension.
  */
 @Component
-public class BuildToolAnalyserFactory {
-    private final Map<BuildToolType, BuildToolAnalyser> analyserMap;
+public class BuildToolParserFactory {
+    private final Map<BuildToolType, BuildToolParser> parserMap;
 
     /**
-     * Constructs a new BuildToolAnalyserFactory instance with the provided list of BuildToolAnalyser implementations.
+     * Constructs a new BuildToolParserFactory instance with the provided list of BuildToolParser implementations.
      *
-     * @param analysers A list of BuildToolAnalyser implementations to be used in the factory.
+     * @param parsers A list of BuildToolParser implementations to be used in the factory.
      */
     @Autowired
-    public BuildToolAnalyserFactory(List<BuildToolAnalyser> analysers) {
-        this.analyserMap = analysers.stream()
-                .collect(Collectors.toMap(BuildToolAnalyser::getBuildToolType, Function.identity()));
+    public BuildToolParserFactory(List<BuildToolParser> parsers) {
+        this.parserMap = parsers.stream()
+                .collect(Collectors.toMap(BuildToolParser::getBuildToolType, Function.identity()));
     }
 
     /**
-     * Retrieves the BuildToolAnalyser associated with the provided BuildToolType.
+     * Retrieves the BuildToolParser associated with the provided BuildToolType.
      *
-     * @param buildToolType The BuildToolType for which the corresponding BuildToolAnalyser is to be retrieved.
-     * @return The BuildToolAnalyser instance associated with the specified BuildToolType or null if not found.
+     * @param buildToolType The BuildToolType for which the corresponding BuildToolParser is to be retrieved.
+     * @return The BuildToolParser instance associated with the specified BuildToolType or null if not found.
      */
-    public BuildToolAnalyser getAnalyser(BuildToolType buildToolType) {
-        return analyserMap.get(buildToolType);
+    public BuildToolParser getParser(BuildToolType buildToolType) {
+        return parserMap.get(buildToolType);
     }
 
     /**

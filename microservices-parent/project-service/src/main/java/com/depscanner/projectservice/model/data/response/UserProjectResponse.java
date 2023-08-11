@@ -2,6 +2,7 @@ package com.depscanner.projectservice.model.data.response;
 
 import com.depscanner.projectservice.model.data.dto.DependencyDto;
 import com.depscanner.projectservice.model.enumeration.ProjectType;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,5 +23,7 @@ public class UserProjectResponse {
     private ProjectType projectType;
     private int projectDependenciesCount;
     private int vulnerableDependenciesCount;
+    private boolean isDailyScanned;
+    private boolean isWeeklyScanned;
     private List<DependencyDto> dependencies;
 }

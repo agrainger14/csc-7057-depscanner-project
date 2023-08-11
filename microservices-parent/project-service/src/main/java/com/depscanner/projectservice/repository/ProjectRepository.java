@@ -17,4 +17,7 @@ public interface ProjectRepository extends MongoRepository<ProjectEntity, String
      * @return ProjectEntity Optional
      */
     List<ProjectEntity> findAllByEmail(String userEmail);
+
+    List<ProjectEntity> findByIsDailyScannedTrue();
+    List<ProjectEntity> findByIsWeeklyScannedTrue();
 }

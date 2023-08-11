@@ -25,14 +25,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * A component that implements the BuildToolAnalyser interface to parse Maven pom (Project Object Model) files
+ * A component that implements the BuildToolParser interface to parse Maven pom (Project Object Model) files
  * and extract the dependencies listed in them. It also handles resolving dependency versions from the parent pom
  * (if possible) and parsing the properties defined in the pom file.
  */
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class MavenParser implements BuildToolAnalyser {
+public class MavenParser implements BuildToolParser {
     /**
      * The MavenXpp3Reader instance used to read Maven pom files in XML format.
      */

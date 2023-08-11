@@ -1,10 +1,12 @@
 package com.depscanner.projectservice.controller;
 
 import com.depscanner.projectservice.model.data.dto.DependencyDto;
+import com.depscanner.projectservice.model.data.request.ScanUpdateRequest;
 import com.depscanner.projectservice.model.data.response.DeleteResponse;
 import com.depscanner.projectservice.model.data.response.ProjectResponse;
 import com.depscanner.projectservice.model.data.request.DependencyRequest;
 import com.depscanner.projectservice.model.data.request.ProjectRequest;
+import com.depscanner.projectservice.model.data.response.ScanUpdateResponse;
 import com.depscanner.projectservice.model.data.response.UserProjectResponse;
 import com.depscanner.projectservice.service.ProjectService;
 import jakarta.validation.Valid;
@@ -49,26 +51,12 @@ public class ProjectController {
         return ResponseEntity.ok(projectService.readProjectById(projectId));
     }
 
-    @PatchMapping("/id/{projectId}/dependency")
-    public ResponseEntity<ProjectResponse> updateProjectDependencies(@PathVariable("projectId") String projectId,
-                                                                     @RequestBody @Valid List<DependencyRequest> dependencies) {
-        if (dependencies.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        return ResponseEntity.ok(projectService.updateProjectDependencies(projectId, dependencies));
+    @PatchMapping("/id/{projectId}")
+    public ResponseEntity<ScanUpdateResponse> updateProjectScheduledScan(@PathVariable("projectId") String projectId,
+                                                                        @RequestBody @Valid ScanUpdateRequest scanUpdateRequest) {
+        return ResponseEntity.ok(projectService.updateProjectScheduledScan(projectId, scanUpdateRequest));
     }
 
-    @PatchMapping("/id/{projectId}/dependency/{dependencyId}/{version}")
-    public ResponseEntity<DependencyDto> updatedProjectDependencyVersion(@PathVariable("projectId") String projectId,
-                                                                         @PathVariable("dependencyId") String dependencyId,
-                                                                         @PathVariable("version") String version) {
-        if (dependencyId.isEmpty() || projectId.isEmpty() || version.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        return ResponseEntity.ok(projectService.updateProjectDependencyVersion(projectId, dependencyId, version));
-    }
 
     @DeleteMapping("/id/{projectId}")
     public ResponseEntity<DeleteResponse> deleteUserProject(@PathVariable("projectId") String projectId) {
