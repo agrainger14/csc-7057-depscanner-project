@@ -29,7 +29,8 @@ The backend has been developed with Spring Boot (Java) with a microservices base
 
 ## How to run
 The microservices are available as docker containers.
-After repo clone
+
+_Docker Compose_
 
 ```bash
 cd microservices-parent
