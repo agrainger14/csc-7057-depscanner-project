@@ -37,7 +37,8 @@ cd microservices-parent
 docker-compose up --build -d
 ```
 
-_React UI_
+_DepScanner UI_
+
 ```bash
 cd depscanner-ui
 npm i
