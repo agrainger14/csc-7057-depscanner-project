@@ -28,7 +28,7 @@ The backend has been developed with Spring Boot (Java) with a microservices base
 ![image](https://github.com/agrainger14/csc-7057-depscanner-project/assets/132609173/ed40308a-6697-44c0-bf45-02ac589dac80)
 
 ## How to run
-The microservices are available as docker containers.
+The microservices are available as docker images and the API can be ran as a container.
 
 _Docker Compose_
 
