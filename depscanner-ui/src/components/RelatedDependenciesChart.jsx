@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 
-const RelatedDependenciesChart = ({ dependencyData }) => {
+const RelatedDependenciesChart = ({ dependencyData, setSelectedTab }) => {
   const [self, setSelf] = React.useState(0);
   const [directCount, setDirectCount] = React.useState(0);
   const [indirectCount, setIndirectCount] = React.useState(0);
@@ -96,7 +96,7 @@ const RelatedDependenciesChart = ({ dependencyData }) => {
           />
         </Box>
       </Box>
-      <Button disableRipple disableElevation style={{ backgroundColor: 'transparent' }}>
+      <Button disableRipple disableElevation style={{ backgroundColor: 'transparent' }} onClick={() => setSelectedTab(1)}>
         View All Dependencies
       </Button>
     </Box>

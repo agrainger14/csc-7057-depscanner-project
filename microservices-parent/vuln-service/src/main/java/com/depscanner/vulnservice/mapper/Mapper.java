@@ -44,7 +44,7 @@ public class Mapper {
                 .build();
     }
 
-    public RelatedDependency mapToNodeEntity(NodeDto nodeDto) {
+    public RelatedDependency mapToRelatedDependencyEntity(NodeDto nodeDto) {
         return RelatedDependency.builder()
                 .bundled(nodeDto.getBundled())
                 .errors(nodeDto.getErrors())
@@ -224,7 +224,7 @@ public class Mapper {
                 .build();
     }
 
-    public void mapToDependency(PackageResponseDto responseDto) {
+    public Dependency mapToDependency(PackageResponseDto responseDto) {
         Dependency dependency = Dependency.builder()
                 .name(responseDto.getPackageKey().getName())
                 .system(mapToSystem(responseDto.getPackageKey().getSystem()))
@@ -232,12 +232,13 @@ public class Mapper {
 
         dependency.setVersions(responseDto.getVersions()
                 .stream()
-                .map(version -> mapDependencyVersion(version, dependency))
-                .collect(Collectors.toSet()));
+                .map(version -> mapToDependencyVersion(version, dependency))
+                .toList());
         dependencyRepository.save(dependency);
+        return dependency;
     }
 
-    public Version mapDependencyVersion(VersionDto versionDto, Dependency dependency) {
+    public Version mapToDependencyVersion(VersionDto versionDto, Dependency dependency) {
         Optional<Version> versionOptional = versionRepository
                 .findByDependency_NameAndDependency_System_SystemAndVersion
                         (dependency.getName(), dependency.getSystem().getSystem(), versionDto.getVersionKey().getVersion());
@@ -246,7 +247,7 @@ public class Mapper {
             return versionOptional.get();
         } else {
             Version version = Version.builder()
-                    .dependency(mapToDependency(dependency.getName(), dependency.getSystem().getSystem()))
+                    .dependency(dependency)
                     .version(versionDto.getVersionKey().getVersion())
                     .build();
             version.setVersionDetail(mapToVersionDetail(versionDto, version));

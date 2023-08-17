@@ -69,7 +69,8 @@ public class ProjectService {
                                 .toList())
                         .build())
                 .toList();
-        vulnerableDependencyCount(userProjectsResponses);
+
+        userProjectsResponses.forEach(userProjectResponse -> vulnerableDependencyCount(userProjectResponse));
         return userProjectsResponses;
     }
 
@@ -79,19 +80,20 @@ public class ProjectService {
      * This method interacts with the vulnerability service to obtain up-to-date data on the vulnerability
      * status of the dependencies in the users projects.
      *
-     * @param userProjects The list of ProjectResponse objects to check for vulnerability.
+     * @param userProject The ProjectResponse objects to check for vulnerability.
      */
-    private void vulnerableDependencyCount(List<UserProjectResponse> userProjects) {
+    private void vulnerableDependencyCount(UserProjectResponse userProject) {
+        int vulnerableDependencyCount = 0;
+
         //convert the users projects dependencies to a list to make the API call to vuln-service
-        List<DependencyDto> dependencyRequestList = userProjects.stream()
-                .map(UserProjectResponse::getDependencies)
-                .flatMap(List::stream)
+        List<DependencyDto> dependencyRequestList = userProject.getDependencies()
+                .stream()
                 .toList();
 
         Span vulnServiceCheckLookup = tracer.nextSpan().name("VulnServiceCheckLookup");
 
+        //data is posted in a request body to prevent repeat API calls to the vuln-service
         try (Tracer.SpanInScope spanInScope = tracer.withSpanInScope(vulnServiceCheckLookup.start())) {
-            //data is posted in a request body to prevent repeat API calls to the vuln-service
             DependencyResponse[] dependencyResponseArray = webClient.build().post()
                     .uri("http://vuln-service/check")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -101,37 +103,31 @@ public class ProjectService {
                     .block();
 
             //create map of vulnerable dependency keys (with isDataAvailable flag)
-            Map<String, Boolean> vulnerableDependenciesMap = Arrays.stream(Objects.requireNonNull(dependencyResponseArray))
-                    .collect(Collectors.toMap(
-                            response -> response.getName() + response.getVersion() + response.getSystem(),
-                            DependencyResponse::getIsDataAvailable
-                    ));
+            Map<String, Boolean> vulnerableDependenciesMap = Arrays.stream(dependencyResponseArray)
+                .collect(Collectors.toMap(
+                        response -> response.getName() + response.getVersion() + response.getSystem(),
+                        DependencyResponse::getIsDataAvailable)
+                );
 
-            //loop through projectResponses to check all dependencies
-            for (UserProjectResponse projectResponse : userProjects) {
-                int vulnerableDependencyCount = 0;
-                List<DependencyDto> dependencies = projectResponse.getDependencies();
+            for (DependencyDto dependency : dependencyRequestList) {
+                // The 'id' is the name, version, and system of the dependency
+                String key = dependency.getName() + dependency.getVersion() + dependency.getSystem();
+                Boolean isDataAvailable = vulnerableDependenciesMap.get(key);
 
-                for (DependencyDto dependency : dependencies) {
-                    //the 'id' is the name, version and system of the dependency.
-                    String key = dependency.getName() + dependency.getVersion() + dependency.getSystem();
-                    Boolean isDataAvailable = vulnerableDependenciesMap.get(key);
-
-                    if (isDataAvailable != null && isDataAvailable) {
-                        //if present in the map from the response, the dependency is vulnerable.
-                        dependency.setIsVulnerable(true);
-                        vulnerableDependencyCount++;
-                    } else if (isDataAvailable != null && !isDataAvailable) {
-                        //if the key is present, but the value is false there is no information available, set to null.
-                        dependency.setIsVulnerable(null);
-                    } else {
-                        //if the key is present in the map, set to false as the dependency is not vulnerable.
-                        dependency.setIsVulnerable(false);
-                    }
+                if (isDataAvailable != null && isDataAvailable) {
+                    //if present in the map from the response, the dependency is vulnerable.
+                    dependency.setIsVulnerable(true);
+                    vulnerableDependencyCount++;
+                } else if (isDataAvailable != null && !isDataAvailable) {
+                    //if the key is present, but the value is false there is no information available, set to null.
+                    dependency.setIsVulnerable(null);
+                } else {
+                    //if the key is present in the map, set to false as the dependency is not vulnerable.
+                    dependency.setIsVulnerable(false);
                 }
-                //after all dependencies checked, set the vulnerable dependency count.
-                projectResponse.setVulnerableDependenciesCount(vulnerableDependencyCount);
             }
+            // After all dependencies are checked, set the vulnerable dependency count
+            userProject.setVulnerableDependenciesCount(vulnerableDependencyCount);
         } finally {
             vulnServiceCheckLookup.finish();
         }
@@ -151,7 +147,7 @@ public class ProjectService {
 
         emailAuthorisationCheck(project);
         UserProjectResponse userProjectResponse = modelMapper.map(project, UserProjectResponse.class);
-        vulnerableDependencyCount(Collections.singletonList(userProjectResponse));
+        vulnerableDependencyCount(userProjectResponse);
 
         return userProjectResponse;
     }
@@ -182,6 +178,9 @@ public class ProjectService {
                 })
                 .toList());
 
+        //save project to db
+        projectRepository.save(project);
+
         //null check to prevent worst case null pointer exception, then send a kafka event to scan against Deps.dev API
         if (project.getDependencies() != null) {
             List<DependencyDto> dependencyList = project.getDependencies()
@@ -193,12 +192,9 @@ public class ProjectService {
             kafkaTemplate.send("project-vuln-scan-topic", vulnScanEvent);
         }
 
-        //save project to db
-        projectRepository.save(project);
-
         //return with project successfully created
         UserProjectResponse userProjectResponse = modelMapper.map(project, UserProjectResponse.class);
-        vulnerableDependencyCount(Collections.singletonList(userProjectResponse));
+        vulnerableDependencyCount(userProjectResponse);
         return userProjectResponse;
     }
 

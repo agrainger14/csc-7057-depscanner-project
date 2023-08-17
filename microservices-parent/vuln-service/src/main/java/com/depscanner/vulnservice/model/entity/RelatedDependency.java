@@ -23,9 +23,6 @@ public class RelatedDependency {
     @JoinColumn(name = "version_id")
     private Version version;
 
-    @ManyToMany(mappedBy = "relatedDependencies", cascade = { CascadeType.MERGE, CascadeType.PERSIST })
-    private List<Version> versions;
-
     private Boolean bundled;
     private String relation;
     private List<String> errors;

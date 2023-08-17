@@ -10,7 +10,6 @@ const FileUpload = ({ setActiveStep, setProjectDependencies, setEnableNext }) =>
 
   React.useEffect(() => {
     setEnableNext(false);
-
   }, []);
 
   const handleFileChange = async (e) => {

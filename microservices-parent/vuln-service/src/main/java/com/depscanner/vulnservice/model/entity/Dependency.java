@@ -3,7 +3,7 @@ package com.depscanner.vulnservice.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Builder
@@ -23,5 +23,5 @@ public class Dependency {
     private SystemEntity system;
 
     @OneToMany(mappedBy = "dependency", cascade = CascadeType.ALL)
-    private Set<Version> versions;
+    private List<Version> versions;
 }

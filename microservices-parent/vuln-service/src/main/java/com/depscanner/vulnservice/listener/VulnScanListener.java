@@ -27,7 +27,6 @@ import java.util.*;
 @Component
 @RequiredArgsConstructor
 public class VulnScanListener {
-    private final TaskExecutor taskExecutor;
     private final GetDependenciesService getDependenciesService;
     private final GetVersionService getVersionService;
     private final GetAdvisoryService getAdvisoryService;
@@ -50,25 +49,25 @@ public class VulnScanListener {
         }
     }
 
+    @Transactional
     public Set<VulnDependency> processDependency(List<DependencyDto> dependencies) {
         Set<VulnDependency> vulnDependencyList = new HashSet<>();
         Set<DependencyDto> visitedDependencies = new HashSet<>();
         Deque<DependencyDto> dependencyStack = new ArrayDeque<>(dependencies);
 
         while (!dependencyStack.isEmpty()) {
-            final DependencyDto currentDependency = dependencyStack.pop();
+            DependencyDto currentDependency = dependencyStack.pop();
 
-            final String name = currentDependency.getName();
-            final String version = currentDependency.getVersion();
-            final String system = currentDependency.getSystem();
-
-            log.info("Scanning : " + name + " | " + system + " | " + version);
+            String name = currentDependency.getName();
+            String version = currentDependency.getVersion();
+            String system = currentDependency.getSystem();
 
             if (visitedDependencies.contains(currentDependency)) {
                 continue; // Don't need to revisit this again. We already got the data from deps.dev API.
             }
 
             visitedDependencies.add(currentDependency);
+            log.info("Scanning : " + name + " | " + system + " | " + version);
             VersionsResponseDto dependencyVersionData = getVersionData(currentDependency);
 
             if (dependencyVersionData != null && !dependencyVersionData.getAdvisoryKeys().isEmpty()) {
@@ -135,26 +134,8 @@ public class VulnScanListener {
 
         if (versionsResponseDto != null) {
             getVersionService.addDependencyData(versionsResponseDto);
-
-            if (versionsResponseDto.getAdvisoryKeys().size() > 0) {
-                getAdvisoryData(versionsResponseDto.getAdvisoryKeys());
-            }
         }
         return versionsResponseDto;
-    }
-
-
-    public void getAdvisoryData(List<AdvisoryKeyDto> advisoryKey) {
-        for (AdvisoryKeyDto advisory : advisoryKey) {
-            String getAdvisoryUrl = ApiHelper.buildApiUrl(ApiHelper.GET_ADVISORY_URL, advisory.getId());
-
-            isUrlValid(getAdvisoryUrl);
-            AdvisoryResponse responseDto = ApiHelper.makeApiRequest(getAdvisoryUrl, AdvisoryResponse.class);
-
-            if (responseDto != null) {
-                getAdvisoryService.createAdvisoryData(responseDto);
-            }
-        }
     }
 
     private void isUrlValid(String apiUrl) {

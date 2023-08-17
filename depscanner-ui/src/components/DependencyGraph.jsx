@@ -124,8 +124,8 @@ function zoomed(event) {
 
   function dragstarted(event) {
     if (!event.active) simulation.alphaTarget(0.3).restart();
-    d.fx = d.x; // Use d.fx instead of event.subject.fx
-    d.fy = d.y; // Use d.fy instead of event.subject.fy
+    d.fx = d.x; 
+    d.fy = d.y; 
   }
 
   function dragged(event) {
@@ -135,8 +135,8 @@ function zoomed(event) {
 
   function dragended(event) {
     if (!event.active) simulation.alphaTarget(0);
-    d.fx = null; // Remove setting d.fx
-    d.fy = null; // Remove setting d.fy
+    d.fx = null;
+    d.fy = null; 
   }
 
     return () => {
@@ -150,7 +150,6 @@ function zoomed(event) {
       <div className="ui-container">
         <button className="zoom-button" onClick={() => zoomIn()}>+</button>
         <button className="zoom-button" onClick={() => zoomOut()}>-</button>
-        {/* Other UI elements can be added here */}
       </div>
     </div>
   );

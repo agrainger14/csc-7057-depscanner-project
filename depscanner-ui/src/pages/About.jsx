@@ -11,7 +11,7 @@ const About = () => {
     <Box>
       <Box sx={{minHeight: '100vh'}}>
           <Header/>
-          <Box sx={{background: `url(${AboutBackground})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '115vh'}}>
+          <Box sx={{background: `url(${AboutBackground})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '125vh'}}>
           <Container maxWidth={'lg'} sx={{backgroundColor:'background.default', mb:2, mt:2, 
                   border: '1px solid white',
                   boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',

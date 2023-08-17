@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Container, TextField, Grid, Hidden, Link, TableSortLabel } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Container, TextField, Grid, Hidden, Link, TableSortLabel, Button } from '@mui/material';
 
 const DependencyTable = ({ dependencyData }) => {
   const [searchTerm, setSearchTerm] = React.useState('');
@@ -99,7 +99,7 @@ const DependencyTable = ({ dependencyData }) => {
                      direction={orderBy === 'advisoryDetail' ? order : 'asc'}
                       onClick={() => handleSort('advisoryDetail')}
                   >
-                      Notes
+                      Security Advisories
                     </TableSortLabel>
                   </TableCell>
                   <Hidden smDown>
@@ -139,9 +139,9 @@ const DependencyTable = ({ dependencyData }) => {
                     </Typography>
                     </TableCell>
                     <Hidden smDown>
-                    <TableCell>{dependency.advisoryDetail.length > 0 && dependency.advisoryDetail.length}</TableCell>
+                    <TableCell><Button sx={{color:'red'}}>{dependency.advisoryDetail.length > 0 && dependency.advisoryDetail.length}</Button></TableCell>
                     <TableCell>{dependency.relation}</TableCell>
-                    <TableCell>{dependency.licenses}</TableCell>
+                    <TableCell>{dependency.licenses.join(', ')}</TableCell>
                     </Hidden>
                   </TableRow>
                 ))

@@ -8,7 +8,7 @@ import RelatedDependenciesChart from './RelatedDependenciesChart';
 import SSFScoreCard from './SSFScoreCard';
 import LicensesChart from './LicensesChart';
 
-const DependencyOverview = ({ dependencyData }) => {
+const DependencyOverview = ({ dependencyData, setSelectedTab }) => {
   const totalAdvisory = dependencyData && dependencyData.dependency.reduce((count, item) => count + item.advisoryDetail.length, 0);
 
   return (
@@ -82,7 +82,7 @@ const DependencyOverview = ({ dependencyData }) => {
                       ))
                     )
                   ) : (
-                    <Typography>None Detected</Typography>
+                    <Typography variant="body2" sx={{mt:2, fontSize: '20px'}}>None Detected!</Typography>
                   )}
                 </Container>
         </Paper>
@@ -124,7 +124,7 @@ const DependencyOverview = ({ dependencyData }) => {
             <Paper variant="outlined" sx={{ flex: 1, minHeight: '100px', position: 'relative' }}>
             <Typography variant="h4" sx={{ml:2, mr:2, mt:2}}>Dependencies</Typography>
             <Divider sx={{ml:2,mr:2}}/>
-                <RelatedDependenciesChart dependencyData={dependencyData}/>
+                <RelatedDependenciesChart dependencyData={dependencyData} setSelectedTab={setSelectedTab} />
             </Paper>
             }
         </Box>

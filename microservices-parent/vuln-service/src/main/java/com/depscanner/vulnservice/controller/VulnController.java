@@ -36,7 +36,7 @@ public class VulnController {
 
     @GetMapping("/versions")
     public ResponseEntity<PackageResponseDto> getAllDependencyVersions(@RequestParam String name, @RequestParam String system) {
-        return ResponseEntity.ok(getPackageService.readPackage(system, name));
+        return ResponseEntity.ok(getPackageService.readPackage(name, system));
     }
 
     @GetMapping("/dependencies")
@@ -58,7 +58,7 @@ public class VulnController {
     }
 
     @PostMapping("/check")
-    public ResponseEntity<Set<VulnCheckResponse>> checkVulnerableDependencies(@RequestBody List<DependencyRequest> dependencyRequestList) {
+    public ResponseEntity<List<VulnCheckResponse>> checkVulnerableDependencies(@RequestBody List<DependencyRequest> dependencyRequestList) {
         return ResponseEntity.ok(getVersionService.checkIfDependenciesVulnerable(dependencyRequestList));
     }
 }

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html layout:decorate="layouts/defaultLayout" xmlns:th="http://www.thymeleaf.org">
-
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Vuln Detected Email</title>
@@ -289,7 +288,7 @@
                             <td style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:arial,helvetica,sans-serif;" align="left">
 
                                 <div style="font-size: 14px; font-weight: 400; color: #ecf0f1; line-height: 140%; text-align: center; word-wrap: break-word;">
-                                    <p style="line-height: 140%;">Please visit your project on the DepScanner Application to find remedial actions.</p>
+                                    <p style="line-height: 140%;">Please <a th:href="@{'http://localhost:5173/project/' + ${projectDetails.id}}">click here</a> to visit your project on the DepScanner Application and find remedial actions.</p>
                                     <p style="line-height: 140%;"> </p>
                                     <p style="line-height: 140%;">This information has been provided to you with the help of Googles open source insights project.</p>
                                     <p style="line-height: 140%;">The DepScanner Project.</p>

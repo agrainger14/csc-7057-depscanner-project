@@ -6,8 +6,9 @@ import Cvss3ScoreCalculator from './Cvss3ScoreCalculator';
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 
 const OsvData = ({ osvData }) => {
+
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const { id, summary, details, aliases, modified, published, database_specific, references, affected, severity } = osvData;
+  const { id, summary, details, aliases, modified, published, references, affected, severity } = osvData;
 
   const handleModalOpen = () => {
     setIsModalOpen(true);
@@ -46,47 +47,49 @@ const OsvData = ({ osvData }) => {
               </Typography>
               <Divider/>
             </Box>
-          <Box py={0.5}>
-            <Typography variant='h4' sx={{fontWeight: 700, mb:1}}>Overview</Typography> 
-            <Grid container spacing={9.5} alignItems="center">
-              <Grid item>
-                <Typography sx={{ fontWeight: 500, pb: 0.5}}>Vulnerability ID:</Typography>
-              </Grid>
-              <Grid item>
-                <Typography sx={{pb:0.5}}>{id}</Typography>
-              </Grid>
-            </Grid>
-            <Grid container spacing={18.3}alignItems="center">
-              <Grid item>
-                <Typography sx={{ fontWeight: 500, pb: 0.5 }}>Aliases: </Typography>
-              </Grid>
-              <Grid item>
-                <Typography sx={{pb:0.5}} variant="body1">
-                    {aliases}
-                </Typography>
-              </Grid>
-            </Grid>
-            <Grid container alignItems="center">
-              <Grid item>
-                <Typography sx={{ fontWeight: 500, pb: 0.5, pr:2}}>Affected Dependency: </Typography>
-              </Grid>
-              <Grid item>
-                <Typography sx={{pb:0.5}} variant="body1">
-                  <Link href="/dependency/">
-                    {affected[0].package.name}
-                  </Link>
-                </Typography>
-              </Grid>
-            </Grid>
-            <Grid container spacing={17.5} alignItems="center">
-              <Grid item>
-                <Typography sx={{ fontWeight: 500 }}>Severity: </Typography>
-              </Grid>
-              <Grid item>
-                <Cvss3ScoreCalculator score={severity[0].score}/>
-              </Grid>
-            </Grid>
-          </Box>
+            <Box py={0.5}>
+      <Typography variant='h4' sx={{ fontWeight: 700, mb: 1 }}>Overview</Typography>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item>
+          <Typography sx={{ fontWeight: 500, pb: 0.5 }}>Vulnerability ID:</Typography>
+        </Grid>
+        <Grid item>
+          <Typography sx={{ pb: 0.5 }}>{id}</Typography>
+        </Grid>
+      </Grid>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item>
+        {aliases && 
+          <Typography sx={{ fontWeight: 500, pb: 0.5 }}>Aliases:</Typography>
+        }
+        </Grid>
+        <Grid item>
+          <Typography sx={{ pb: 0.5 }} variant="body1">
+            {aliases}
+          </Typography>
+        </Grid>
+      </Grid>
+      <Grid container alignItems="center">
+        <Grid item>
+          <Typography sx={{ fontWeight: 500, pb: 0.5, pr: 2 }}>Affected Dependency:</Typography>
+        </Grid>
+        <Grid item>
+          <Typography sx={{ pb: 0.5 }} variant="body1">
+            <Link href="/dependency/">
+              {affected[0].package.name}
+            </Link>
+          </Typography>
+        </Grid>
+      </Grid>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item>
+          <Typography sx={{ fontWeight: 500 }}>Severity:</Typography>
+        </Grid>
+        <Grid item>
+          <Cvss3ScoreCalculator score={severity ? severity[0].score : 0} />
+        </Grid>
+      </Grid>
+    </Box>
           <Box sx={{mt:2, mb:1}}>
             <Typography sx={{ fontWeight: 500 }}>Description: </Typography>
             <Typography variant="body2" sx={{fontSize:'20px'}}>{details}</Typography>
@@ -115,13 +118,15 @@ const OsvData = ({ osvData }) => {
               Vulnerability Fix: Upgrade dependency to version {affected[0].ranges[0].events[1].fixed}+! 
               </Typography>
           </Box>}
+          {affected[0].versions && 
             <Button variant="outlined" sx={{mt:1, mb:1}} onClick={handleModalOpen}>
               Show All Affected Versions
             </Button>
+          }
             <Dialog open={isModalOpen} onClose={handleModalClose} sx={{overflow: 'hidden' }}>
               <DialogTitle>All Affected Versions</DialogTitle>
               <DialogContent>
-                {affected[0].versions.map((version, index) => (
+                {affected[0].versions && affected[0].versions.map((version, index) => (
                 <RouterLink 
                   key={index} 
                   style={{color: 'inherit' }}

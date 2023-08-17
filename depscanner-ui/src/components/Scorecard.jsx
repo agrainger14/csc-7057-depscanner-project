@@ -2,43 +2,44 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 
 const ScoreCard = ({ cvss3Score }) => {
+  console.log(cvss3Score)
   let backgroundColour = '';
   let borderColour = '';
   let textColour = '';
   let text = '';
 
-    switch (true) {
-      case cvss3Score >= 9.0:
-        backgroundColour = 'red';
-        textColour = 'white';
-        borderColour = 'black';
-        text = `${cvss3Score} CRITICAL`;
-        break;
-      case cvss3Score >= 7.0:
-        backgroundColour = 'transparent';
-        textColour = 'red';
-        borderColour = 'red';
-        text = `${cvss3Score} High`;
-        break;
-      case cvss3Score >= 4.0:
-        backgroundColour = 'transparent';
-        textColour = 'orange';
-        borderColour = 'orange';
-        text = `${cvss3Score} Moderate`;
-        break;
-      case cvss3Score >= 0.1:
-        backgroundColour = 'transparent';
-        textColour = 'yellow';
-        borderColour = 'yellow';
-        text = `${cvss3Score} Low`;
-        break;
-      default:
-        backgroundColour = 'transparent';
-        textColour = 'green';
-        borderColour = 'green';
-        text = `${cvss3Score} None`;
-        break;
-      }
+  switch (true) {
+    case cvss3Score >= 9:
+      backgroundColour = 'red';
+      textColour = 'white';
+      borderColour = 'black';
+      text = `${cvss3Score} CRITICAL`;
+      break;
+    case cvss3Score >= 7 && cvss3Score < 9:
+      backgroundColour = 'transparent';
+      textColour = 'red';
+      borderColour = 'red';
+      text = `${cvss3Score} High`;
+      break;
+    case cvss3Score >= 4 && cvss3Score < 7:
+      backgroundColour = 'transparent';
+      textColour = 'orange';
+      borderColour = 'orange';
+      text = `${cvss3Score} Moderate`;
+      break;
+    case cvss3Score >= 0.1 && cvss3Score < 4:
+      backgroundColour = 'transparent';
+      textColour = 'yellow';
+      borderColour = 'yellow';
+      text = `${cvss3Score} Low`;
+      break;
+    default: 
+      backgroundColour = 'transparent';
+      textColour = 'green';
+      borderColour = 'green';
+      text = `${cvss3Score} None`;
+      break;
+  }
   
   return (
     <Box

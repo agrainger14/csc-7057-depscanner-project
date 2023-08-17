@@ -1,27 +1,19 @@
 import React from 'react';
-import { Box, Typography, Stack, Snackbar, Alert as MuiAlert } from '@mui/material';
+import { Box, Typography, Snackbar, Alert } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
-const Alert = React.forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-  });
+const SubmittedSuccess = ({ id }) => {
+  const navigate = useNavigate();
+  const [successSnackbarOpen, setSuccessSnackbarOpen] = React.useState(true);
 
-const SubmittedSuccess = () => {
-    const [open, setOpen] = React.useState(false);
-
-    const handleClick = () => {
-      setOpen(true);
-    };
-  
-    const handleClose = (event, reason) => {
-      if (reason === 'clickaway') {
-        return;
-      }
-  
-      setOpen(false);
-    };
+  const handleCloseSnackbar = () => {
+    setSuccessSnackbarOpen(false);
+    navigate(`/project/${id}`);
+  };
 
   return (
+    <>
     <Box
           display="flex"
           flexDirection="column"
@@ -34,6 +26,16 @@ const SubmittedSuccess = () => {
             Project has successfully been created!
           </Typography>
     </Box>
+            <Snackbar
+            open={successSnackbarOpen}
+            autoHideDuration={5000}
+            onClose={handleCloseSnackbar}
+            >
+              <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+                Redirecting to Project Summary.....
+              </Alert>
+            </Snackbar>
+    </>
   );
 };
 

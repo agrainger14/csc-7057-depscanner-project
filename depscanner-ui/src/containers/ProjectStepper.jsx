@@ -22,16 +22,25 @@ const stepStyle = {
 
 export default function ProjectStepper() {
   const { projectData, setProjectData } = React.useContext(ProjectDataContext); 
+
   const [activeStep, setActiveStep] = React.useState(0);
   const [enableNext, setEnableNext] = React.useState(false);
+  const [id, setId] = React.useState(null);
+
   const [projectSubmitted, setProjectSubmitted] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+
   const [projectName, setProjectName] = React.useState(null);
   const [projectDescription, setProjectDescription] = React.useState(null);
   const [projectDependencies, setProjectDependencies] = React.useState(null);
+  const [scanFrequency, setScanFrequency] = React.useState(null);
+  const [dailyScanned, setDailyScanned] = React.useState(false);
+  const [weeklyScanned, setWeeklyScanned] = React.useState(false);
+
   const { idToken } = useOidcIdToken();
 
   React.useEffect(() => {
+    handleScanFrequency();
     if (activeStep === steps.length && !projectSubmitted) {
       const submitProject = async () => {
         const controller = new AbortController();
@@ -41,6 +50,8 @@ export default function ProjectStepper() {
           name: projectName,
           description: projectDescription,
           dependencies: projectDependencies,
+          dailyScanned: dailyScanned,
+          weeklyScanned: weeklyScanned
         }
 
         const headers = {
@@ -53,6 +64,7 @@ export default function ProjectStepper() {
             signal: controller.signal
           })
           setProjectSubmitted(true);
+          setId(res.data.id);
 
           const allProjects = projectData ? [...projectData, res.data] : [res.data];
           setProjectData(allProjects);
@@ -69,7 +81,23 @@ export default function ProjectStepper() {
       }
       submitProject();
     }
-  }, [activeStep]);
+  }, [activeStep, scanFrequency]);
+
+  const handleScanFrequency = () => {
+    switch (scanFrequency) {
+      case 'WEEKLY':
+        setWeeklyScanned(true);
+        setDailyScanned(false);
+        break;
+      case 'DAILY':
+        setDailyScanned(true);
+        setWeeklyScanned(false);
+        break;
+      default:
+        setWeeklyScanned(false);
+        setDailyScanned(false);
+    }
+  };
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -99,7 +127,7 @@ export default function ProjectStepper() {
               <LoadingSpinner />
             ) 
             : projectSubmitted && !isLoading ? (
-              <SubmittedSuccess/>
+              id && <SubmittedSuccess id={id}/>
           ) : (
             <Typography sx={{ mt: 2, mb: 1 }}>
               Error submitting project, please try again.
@@ -112,7 +140,7 @@ export default function ProjectStepper() {
         </React.Fragment>
       ) : (
         <React.Fragment>
-          <ProjectForm {...{projectDependencies, setProjectName, setProjectDescription, setProjectDependencies, activeStep, setEnableNext, setActiveStep, setProjectSubmitted, setIsLoading}}/>
+          <ProjectForm {...{projectDependencies, setProjectName, setProjectDescription, setProjectDependencies, activeStep, setEnableNext, setActiveStep, scanFrequency, setScanFrequency}}/>
           <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
             {activeStep === 0 ? null : ( 
             <Button

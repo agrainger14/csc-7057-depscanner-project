@@ -116,6 +116,13 @@ const Header = () => {
                 </Typography>
             </Link>
             </MenuItem>
+            <MenuItem onClick={handleCloseNavMenu}>
+            <Link to="/dashboard" style={{ textDecoration: 'none', color: 'inherit'}}>
+                <Typography sx={{fontWeight: 700, ml:1}}>
+                    Dashboard
+                </Typography>
+            </Link>
+            </MenuItem>
             {isAuthenticated ? (
                 <Button sx={{borderRadius: '25px', pt:1.5, pb:1.5, pl:3, pr:3 }}>
                 <Typography onClick={() => logout("http://localhost:5173")} sx={{fontWeight: 700}}>
@@ -136,6 +143,13 @@ const Header = () => {
             <Link to="/about" style={{ textDecoration: 'none', color: 'inherit'}}>
                 <Typography sx={{fontWeight: 700}}>
                     About
+                </Typography>
+            </Link>
+            </MenuItem>
+            <MenuItem onClick={handleCloseNavMenu}>
+            <Link to="/dashboard" style={{ textDecoration: 'none', color: 'inherit'}}>
+                <Typography sx={{fontWeight: 700}}>
+                    Dashboard
                 </Typography>
             </Link>
             </MenuItem>

@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,51 +26,57 @@ public class GetPackageService {
     private final DependencyRepository dependencyRepository;
     private final VersionRepository versionRepository;
 
-    public PackageResponseDto readPackage(String system, String name) {
-        Optional<Dependency> dependencyOptional = dependencyRepository.findByNameAndSystem_System(name, system);
-
-        if (dependencyOptional.isPresent()) {
-            return mapper.mapToPackageResponse(dependencyOptional.get());
-        }
-
-        //if the package version doesn't exist, we don't have data on it. Because this comes from the file upload,
-        //there may be no data available in DB.
-        return fetchPackageData(system, name);
+    public PackageResponseDto readPackage(String name, String system) {
+        return fetchPackageData(name, system);
     }
 
-    private PackageResponseDto fetchPackageData(String system, String name) {
+    private PackageResponseDto fetchPackageData(String name, String system) {
         String getPackageUrl = ApiHelper.buildApiUrl(ApiHelper.GET_PACKAGE_URL, system, ApiHelper.percentEncodeParam(name));
 
         PackageResponseDto responseDto =
                 Optional.ofNullable(ApiHelper.makeApiRequest(getPackageUrl, PackageResponseDto.class))
-                        .orElseThrow(() -> new NoDependencyInformationException("No dependency data available"));
+                        .orElseThrow(() -> new NoDependencyInformationException("No dependency version data available"));
 
-        createPackageData(responseDto);
-        return responseDto;
+
+        if (responseDto != null) {
+            return checkPackageData(responseDto);
+        }
+
+        Optional<Dependency> dependencyOptional = dependencyRepository.findByNameAndSystem_System
+                (name, system);
+
+        if (dependencyOptional.isPresent() && dependencyOptional.get().getVersions().size() > 0) {
+            return mapper.mapToPackageResponse(dependencyOptional.get());
+        }
+
+        throw new NoDependencyInformationException("No dependency version data available");
     }
 
-    public void createPackageData(PackageResponseDto responseDto) {
+    public PackageResponseDto checkPackageData(PackageResponseDto responseDto) {
         Optional<Dependency> dependencyOptional = dependencyRepository.findByNameAndSystem_System
                 (responseDto.getPackageKey().getName(), responseDto.getPackageKey().getSystem());
 
+        Dependency dependency;
+
         if (dependencyOptional.isPresent()) {
             //check if updated information available
-            Dependency dependency = dependencyOptional.get();
+            dependency = dependencyOptional.get();
             updatePackageVersions(dependency, responseDto);
         } else {
-            //save new package information
-            mapper.mapToDependency(responseDto);
+            //create dependency
+            dependency = mapper.mapToDependency(responseDto);
         }
+
+        return mapper.mapToPackageResponse(dependency);
     }
 
     private void updatePackageVersions(Dependency dependency, PackageResponseDto responseDto) {
         if (dependency.getVersions().size() != responseDto.getVersions().size()) {
-            Dependency dependencyToUpdate = dependencyRepository.findById(dependency.getId()).orElseThrow();
-            Set<Version> updatedVersions = responseDto.getVersions()
+            List<Version> updatedVersions = responseDto.getVersions()
                     .stream()
-                    .map(version -> mapper.mapDependencyVersion(version, dependencyToUpdate))
-                    .collect(Collectors.toSet());
-            dependencyToUpdate.setVersions(updatedVersions);
+                    .map(version -> mapper.mapToDependencyVersion(version, dependency))
+                    .toList();
+            dependency.setVersions(updatedVersions);
             versionRepository.saveAll(updatedVersions);
         }
     }

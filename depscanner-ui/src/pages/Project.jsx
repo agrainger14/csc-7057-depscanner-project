@@ -11,10 +11,12 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
 import AppPagination from '../components/AppPagination'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 const Project = () => {
   const [project, setProject] = React.useState(null);
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [isLoading, setIsLoading] = React.useState(true);
   const { id } = useParams();
   const { idToken } = useOidcIdToken();
 
@@ -28,6 +30,7 @@ const Project = () => {
 
     React.useEffect(() => {
       let isMounted = true;
+      setIsLoading(true);
       const controller = new AbortController();
 
       const fetchProjectData = async () => {
@@ -41,6 +44,8 @@ const Project = () => {
           isMounted && setProject(res.data);
         } catch (err) {
           console.error(err)
+        } finally {
+          setIsLoading(false);
         }
       }
 
@@ -55,9 +60,10 @@ const Project = () => {
   return (
     <OidcSecure>
       <Box>
-      {project &&
+      <Header/>
       <Box sx={{background: `url(${Gradient})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '100vh'}}>
-              <Header/>
+      {isLoading ? (<LoadingSpinner/>) : (
+        project && 
         <Container maxWidth={'md'} sx={{backgroundColor:'background.default', 
           display: 'flex',
           mt:2,
@@ -68,6 +74,7 @@ const Project = () => {
           minHeight: '100%',
         }}
         >
+          {console.log(project)}
           <Typography variant="h4" gutterBottom sx={{mt:1}}>
             {project.name}
           </Typography>
@@ -146,9 +153,9 @@ const Project = () => {
             />
           </List>
         </Container>
+        )}
         </Box>
-        }
-          <Footer/>
+        <Footer/>
       </Box>
     </OidcSecure>
   )

@@ -5,6 +5,8 @@ import com.depscanner.vulnservice.exception.NoDependencyInformationException;
 import com.depscanner.vulnservice.mapper.Mapper;
 import com.depscanner.vulnservice.model.data.Request.DependencyRequest;
 import com.depscanner.vulnservice.model.data.Response.VulnCheckResponse;
+import com.depscanner.vulnservice.model.data.getAdvisory.AdvisoryKeyDto;
+import com.depscanner.vulnservice.model.data.getAdvisory.AdvisoryResponse;
 import com.depscanner.vulnservice.model.data.getVersion.VersionsResponseDto;
 import com.depscanner.vulnservice.model.entity.*;
 import com.depscanner.vulnservice.repository.*;
@@ -26,13 +28,6 @@ public class GetVersionService {
     private final GetAdvisoryService getAdvisoryService;
 
     public VersionsResponseDto readDependencyVersionDetail(String system, String dependencyName, String version) {
-        Optional<Version> dependencyVersionOptional = versionRepository
-                .findByDependency_NameAndDependency_System_SystemAndVersion(dependencyName, system, version);
-
-        if (dependencyVersionOptional.isPresent()) {
-            return mapper.mapToDependencyResponse(dependencyVersionOptional.get());
-        }
-
         return fetchVersionData(system, dependencyName, version);
     }
 
@@ -43,24 +38,17 @@ public class GetVersionService {
                 Optional.ofNullable(ApiHelper.makeApiRequest(getVersionUrl, VersionsResponseDto.class))
                         .orElseThrow(() -> new NoDependencyInformationException("No dependency version details available"));
 
-        Optional<Version> versionOptional = versionRepository.findByDependency_NameAndDependency_System_SystemAndVersion
-                (responseDto.getVersionKey().getName(), responseDto.getVersionKey().getSystem(), responseDto.getVersionKey().getVersion());
-
-        if (versionOptional.isPresent()) {
-            return mapper.mapToDependencyResponse(versionOptional.get());
-        }
-
-        createDependencyVersion(responseDto);
+        addDependencyData(responseDto);
         return responseDto;
     }
 
-    public Set<VulnCheckResponse> checkIfDependenciesVulnerable(List<DependencyRequest> dependencyRequestList) {
-        Set<VulnCheckResponse> versionsResponseDtoList = new HashSet<>();
+    public List<VulnCheckResponse> checkIfDependenciesVulnerable(List<DependencyRequest> dependencyRequestList) {
+        List<VulnCheckResponse> versionsResponseDtoList = new LinkedList<>();
 
         for (DependencyRequest dependencyRequest : dependencyRequestList) {
-            final String name = dependencyRequest.getName();
-            final String system = dependencyRequest.getSystem();
-            final String version = dependencyRequest.getVersion();
+            String name = dependencyRequest.getName();
+            String system = dependencyRequest.getSystem();
+            String version = dependencyRequest.getVersion();
 
             Optional<Version> dependencyVersionOptional = versionRepository
                     .findByDependency_NameAndDependency_System_SystemAndVersion(name, system, version);
@@ -82,7 +70,7 @@ public class GetVersionService {
         }
 
         if (versionsResponseDtoList.isEmpty()) {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
 
         return versionsResponseDtoList;
@@ -95,26 +83,51 @@ public class GetVersionService {
                             versionsResponseDto.getVersionKey().getVersion());
 
         if (dependencyVersionOptional.isPresent()) {
-            updateAdvisoryKeys(dependencyVersionOptional.get(), versionsResponseDto);
+            checkVersionDetail(dependencyVersionOptional.get(), versionsResponseDto);
+            checkAdvisoryKeys(dependencyVersionOptional.get(), versionsResponseDto);
         } else {
             createDependencyVersion(versionsResponseDto);
         }
     }
 
-    public void updateAdvisoryKeys(Version version, VersionsResponseDto versionsResponseDto) {
-        version.setAdvisoryKeys(versionsResponseDto.getAdvisoryKeys().stream()
-                .map(mapper::mapToAdvisoryKeyEntity)
-                .collect(Collectors.toList()));
-        version.setLicenses(versionsResponseDto.getLicenses()
-                .stream()
-                .map(mapper::mapToLicenseEntity)
-                .collect(Collectors.toList()));
-        version.setLinks(versionsResponseDto.getLinks()
-                .stream()
-                .map(mapper::mapToLinkEntity)
-                .collect(Collectors.toList()));
-        version.setVersionDetail(mapper.mapToVersionDetail(versionsResponseDto,version));
-        versionRepository.save(version);
+    public void checkVersionDetail(Version version, VersionsResponseDto versionsResponseDto) {
+        boolean dataAdded = false;
+
+        if (version.getVersionDetail() == null) {
+            version.setVersionDetail(mapper.mapToVersionDetail(versionsResponseDto, version));
+            dataAdded = true;
+        }
+
+        if (version.getLinks().isEmpty()) {
+            version.setLinks(versionsResponseDto.getLinks()
+                    .stream()
+                    .map(mapper::mapToLinkEntity)
+                    .collect(Collectors.toList()));
+            dataAdded = true;
+        }
+
+        if (version.getLicenses().isEmpty()) {
+            version.setLicenses(versionsResponseDto.getLicenses()
+                    .stream()
+                    .map(mapper::mapToLicenseEntity)
+                    .collect(Collectors.toList()));
+            dataAdded = true;
+        }
+
+        if (dataAdded) {
+            versionRepository.save(version);
+        }
+    }
+
+    public void checkAdvisoryKeys(Version version, VersionsResponseDto versionsResponseDto) {
+        if (versionsResponseDto.getAdvisoryKeys().size() > version.getAdvisoryKeys().size()) {
+            log.info("New Advisories for dependency : " + version.getDependency().getName() + " " + version.getVersion() + " adding to DB!");
+            version.setAdvisoryKeys(versionsResponseDto.getAdvisoryKeys().stream()
+                    .map(mapper::mapToAdvisoryKeyEntity)
+                    .collect(Collectors.toList()));
+            versionRepository.save(version);
+            getAdvisoryData(versionsResponseDto.getAdvisoryKeys());
+        }
     }
 
     public Version createDependencyVersion(VersionsResponseDto versionsResponseDto) {
@@ -133,15 +146,29 @@ public class GetVersionService {
                             .stream()
                             .map(mapper::mapToLinkEntity)
                             .toList())
+                .relatedDependencies(new LinkedList<>())
+                .edges(new LinkedList<>())
                 .build();
-            dependencyVersion.setVersionDetail(mapper.mapToVersionDetail(versionsResponseDto,dependencyVersion));
-            versionRepository.save(dependencyVersion);
 
-            if (versionsResponseDto.getAdvisoryKeys().size() > 0) {
-                versionsResponseDto.getAdvisoryKeys()
-                        .forEach(advisoryKeyDto -> getAdvisoryService.fetchAdvisoryData(advisoryKeyDto.getId()));
+        dependencyVersion.setVersionDetail(mapper.mapToVersionDetail(versionsResponseDto,dependencyVersion));
+        versionRepository.save(dependencyVersion);
+
+        if (versionsResponseDto.getAdvisoryKeys().size() > 0) {
+            getAdvisoryData(versionsResponseDto.getAdvisoryKeys());
+        }
+
+        return dependencyVersion;
+    }
+
+    public void getAdvisoryData(List<AdvisoryKeyDto> advisoryKey) {
+        for (AdvisoryKeyDto advisory : advisoryKey) {
+            String getAdvisoryUrl = ApiHelper.buildApiUrl(ApiHelper.GET_ADVISORY_URL, advisory.getId());
+
+            AdvisoryResponse responseDto = ApiHelper.makeApiRequest(getAdvisoryUrl, AdvisoryResponse.class);
+
+            if (responseDto != null) {
+                getAdvisoryService.createAdvisoryData(responseDto);
             }
-
-            return dependencyVersion;
         }
     }
+}

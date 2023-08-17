@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { Box, Tooltip, Divider, IconButton } from '@mui/material';
+import { Box, Tooltip, Divider, IconButton, Button } from '@mui/material';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
@@ -9,15 +9,12 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
 import { Link } from 'react-router-dom';
-import ClearIcon from '@mui/icons-material/Clear';
-import ProjectDataContext from '../context/ProjectDataContext';
 import JavaIcon from '../assets/icons/java/icons8-java.svg';
 import NPMIcon from '../assets/icons/javascript/icons8-npm.svg';
+import UpdateScanModal from './UpdateScanModal';
+import DeleteProjectModal from './DeleteProjectModal';
 
 const CardBox = styled(Box)({
-  display: 'flex',
-  flexWrap: 'wrap',
-  justifyContent: 'center',
   margin: 2,
   zIndex: 2,
 })
@@ -52,23 +49,12 @@ const displayProjectIcons = ( projectType ) => {
 }
 
 const ProjectCard = ({ project }) => {
-  const { handleDelete } = React.useContext(ProjectDataContext);
-
   return (
     <CardBox>
       <CardLayout>
         <Box style={{ position: 'relative' }}>
           <CardContent sx={{flexGrow: 1, zIndex: 2, position: 'relative'}}>
-            <IconButton sx={{
-                position: 'absolute',
-                top: 0,
-                right: 0,
-              }}
-              onClick={() => handleDelete(project.id)}
-              aria-label="Delete"
-            >
-              <ClearIcon />
-            </IconButton>
+            <DeleteProjectModal id={project.id}/>
             <Link to={`/project/${project.id}`} style={{ textDecoration: 'none', color:'inherit'}}>
               <Typography variant="h5" sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', fontWeight: 700}}>
                 {project.name}
@@ -81,14 +67,20 @@ const ProjectCard = ({ project }) => {
               </Typography>
               <Divider sx={{mb:1, mt:1}}/>
               <Typography variant="body2" color="textSecondary">
-                Upload Date/Time: {new Date(project.createdAt).toLocaleString()} 
-              </Typography>
-              <Typography variant="body2" color="textSecondary">
                 Total Project Dependencies: {project.projectDependenciesCount}
               </Typography>
               <Typography variant="body2" color="textSecondary">
                 Vulnerable Dependencies Detected: {project.vulnerableDependenciesCount}
               </Typography>
+              <Box sx={{display:'flex', flexDirection:'row'}}>
+              <Typography variant="body2" color="textSecondary" sx={{mt:1}}>
+                Scanning Frequency: {project.weeklyScanned ? "Weekly" : project.dailyScanned ? "Daily" : "None"}
+              </Typography>
+              <UpdateScanModal 
+                  selectedFrequency={project.weeklyScanned ? "Weekly" : project.dailyScanned ? "Daily" : "None"}
+                  projectId={project.id}
+                />
+              </Box>
             </Box>
           </CardContent>
           <ChipLayout>
@@ -104,7 +96,7 @@ const ProjectCard = ({ project }) => {
                     key={dependency.id}
                     label={dependency.name + ' (' + dependency.version + ')'}
                     icon={dependency.isVulnerable ? <ErrorIcon /> : (dependency.isVulnerable === null ? <HelpOutlinedIcon/> : <CheckCircleIcon />)}
-                    color={dependency.isVulnerable ? 'secondary' : (dependency.isVulnerable === null ? 'warning' : 'primary')}
+                    color={dependency.isVulnerable ? 'error' : (dependency.isVulnerable === null ? 'warning' : 'primary')}
                   />
                 </Link>
               </Tooltip>

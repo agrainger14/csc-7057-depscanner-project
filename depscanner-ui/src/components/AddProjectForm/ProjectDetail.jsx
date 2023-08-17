@@ -1,7 +1,7 @@
 import React from 'react'
-import { Container, Box, TextField } from '@mui/material'
+import { Container, Box, TextField, FormLabel, FormControl, FormControlLabel, RadioGroup, Radio } from '@mui/material'
 
-const ProjectDetail = ({projectName, projectDescription, setProjectName, setProjectDescription }) => {
+const ProjectDetail = ({projectName, projectDescription, setProjectName, setProjectDescription, scanFrequency, setScanFrequency }) => {
   return (
     <Box sx={{mt:2}}>
         <Box sx={{ width: '100%', display: 'flex', justifyContent:'center', minHeight: '70vh' }}>
@@ -32,6 +32,30 @@ const ProjectDetail = ({projectName, projectDescription, setProjectName, setProj
                 mt: 3,
               }}
             >
+              <Container
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center', 
+                  alignItems: 'center',
+                  mt: 2,
+                  mb:2,
+                }}
+              >
+            <FormControl component="fieldset">
+              <FormLabel component="legend">Scan Frequency</FormLabel>
+              <RadioGroup
+                row
+                aria-label="scanFrequency"
+                name="scanFrequency"
+                value={scanFrequency || "NONE"}
+                onChange={(e) => setScanFrequency(e.target.value)}
+              >
+                <FormControlLabel value="NONE" control={<Radio />} label="No Scheduled Scans" />
+                <FormControlLabel value="DAILY" control={<Radio />} label="Daily" />
+                <FormControlLabel value="WEEKLY" control={<Radio />} label="Weekly" />
+              </RadioGroup>
+            </FormControl>
+            </Container>
             </Container>
           </Box>
         </Box>

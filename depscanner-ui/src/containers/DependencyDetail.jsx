@@ -5,11 +5,11 @@ import DependencyOverview from '../components/DependencyOverview';
 import DependencyTable from '../components/DependencyTable';
 import DependencyGraph from '../components/DependencyGraph';
 import DependencyDataContext from '../context/DependencyDataContext';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const DependencyDetail = () => {
   const { dependencyData, name, system, version } = React.useContext(DependencyDataContext);
   const [selectedTab, setSelectedTab] = React.useState(0);
-  const [error, setError] = React.useState(false);
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
@@ -32,7 +32,7 @@ const DependencyDetail = () => {
       </Typography>
       </Box>
       <Divider sx={{ ml: 2, mr: 2 }} />
-      {selectedTab === 0 && <DependencyOverview dependencyData={dependencyData} />}
+      {dependencyData ? (selectedTab === 0 && <DependencyOverview dependencyData={dependencyData} setSelectedTab={setSelectedTab} />) : (<LoadingSpinner/>)}
       {selectedTab === 1 && <DependencyTable dependencyData={dependencyData} />}
       {selectedTab === 2 && <DependencyGraph dependencyData={dependencyData}/>}
     </Box>

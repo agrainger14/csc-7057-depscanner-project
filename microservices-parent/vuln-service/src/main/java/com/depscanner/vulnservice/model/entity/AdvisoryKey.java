@@ -17,6 +17,6 @@ public class AdvisoryKey {
 
     private String advisoryId;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL)
     private AdvisoryDetail advisoryDetail;
 }

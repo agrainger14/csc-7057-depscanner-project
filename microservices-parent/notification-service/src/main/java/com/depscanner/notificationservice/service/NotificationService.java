@@ -1,6 +1,7 @@
 package com.depscanner.notificationservice.service;
 
 import com.depscanner.notificationservice.event.AdvisoryFoundEvent;
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +28,8 @@ public class NotificationService {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, MimeMessageHelper.MULTIPART_MODE_MIXED, "UTF-8");
 
             log.info("Advisory discovered... emailing user : " + advisoryFoundEvent.getUserEmail());
-            ;
             mimeMessageHelper.setTo(advisoryFoundEvent.getUserEmail());
-            mimeMessageHelper.setSubject("Vulnerability Detected");
+            mimeMessageHelper.setSubject("DepScanner Vulnerability Notification");
 
             Context context = new Context();
             context.setVariable("userEmail", advisoryFoundEvent.getUserEmail());
@@ -43,7 +43,7 @@ public class NotificationService {
             mimeMessageHelper.addInline("logo", logoResource, "image/png");
 
             javaMailSender.send(mimeMessage);
-        } catch (Exception e) {
+        } catch (MessagingException e) {
             e.printStackTrace();
         }
     }

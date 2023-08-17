@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface AdvisoryDetailRepository extends JpaRepository<AdvisoryDetail, Long> {
     Optional<AdvisoryDetail> findByUrl(String url);
+
 }
