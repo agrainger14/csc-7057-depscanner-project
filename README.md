@@ -3,7 +3,7 @@ DepScanner Project
 
 ## Overview
 An application that allows users to upload a dependency-management file from a project which then parses the open source dependencies
-and retrieves security metadata from the DEPS.DEV API. The application handles user authentication with keycloak, complete with user sign up, login or SSO with GitHub.
+and retrieves security metadata from the DEPS.DEV API (https://deps.dev/). The application handles user authentication with keycloak, complete with user sign up, login or SSO with GitHub.
 The application also contains scanning functionality which will scan the users project for updated security advisories either weekly, daily or not at all (as defined by the user).
 A notification service also provides email notifications to the user if vulnerabilities are detected.
 The frontend user-interface has been developed with React, Material UI and communication with the keycloak realm with OIDC.
