@@ -1,7 +1,10 @@
 package com.depscanner.projectservice.model.entity;
 
 import com.depscanner.projectservice.model.enumeration.BuildToolType;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
 @AllArgsConstructor

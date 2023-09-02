@@ -13,14 +13,21 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+/**
+ * Service class responsible for sending email notifications about discovered advisories to users.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class NotificationService {
-
     private final JavaMailSender javaMailSender;
     private final TemplateEngine templateEngine;
 
+    /**
+     * Listens for messages from the "advisory-found-topic" Kafka topic and sends email notifications to users.
+     *
+     * @param advisoryFoundEvent The event containing information about discovered advisories.
+     */
     @KafkaListener(topics = "advisory-found-topic")
     public void sendMail(AdvisoryFoundEvent advisoryFoundEvent) {
         try {

@@ -13,7 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Main Class for Api Gateway
+ * The main class for the API Gateway application. This class is responsible for starting the API Gateway service,
+ * enabling service discovery, and configuring route definitions for incoming requests.
+ * @see SpringBootApplication
+ * @see EnableDiscoveryClient
  */
 @SpringBootApplication
 @EnableDiscoveryClient
@@ -23,6 +26,12 @@ public class ApiGatewayApplication {
 		SpringApplication.run(ApiGatewayApplication.class, args);
 	}
 
+	/**
+	 * Defines the APIs and their respective route groups for the API Gateway using the provided route definition locator.
+	 *
+	 * @param locator The route definition locator used to discover available route definitions.
+	 * @return A list of grouped open APIs representing the configured routes for the API Gateway.
+	 */
 	@Bean
 	@Lazy(false)
 	public List<GroupedOpenApi> apis(RouteDefinitionLocator locator) {
@@ -38,7 +47,6 @@ public class ApiGatewayApplication {
 			String name = routeDefinition.getId().replaceAll("-service", "");
 			GroupedOpenApi.builder().pathsToMatch("/" + name + "/**").group(name).build();
 		});
-
 		return groups;
 	}
 }

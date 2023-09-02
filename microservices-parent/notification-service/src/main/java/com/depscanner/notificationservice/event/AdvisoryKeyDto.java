@@ -2,6 +2,9 @@ package com.depscanner.notificationservice.event;
 
 import lombok.*;
 
+/**
+ * DTO representing an advisory key.
+ */
 @Data
 @Getter
 @Setter

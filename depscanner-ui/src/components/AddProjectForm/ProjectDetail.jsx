@@ -1,7 +1,17 @@
 import React from 'react'
 import { Container, Box, TextField, FormLabel, FormControl, FormControlLabel, RadioGroup, Radio } from '@mui/material'
 
-const ProjectDetail = ({projectName, projectDescription, setProjectName, setProjectDescription, scanFrequency, setScanFrequency }) => {
+const ProjectDetail = ({projectName, projectDescription, setProjectName, setProjectDescription, scanFrequency, setScanFrequency, setIsFormValid }) => {
+  const handleProjectNameChange = (e) => {
+    setProjectName(e.target.value);
+    setIsFormValid(e.target.value.trim().length >= 3 && projectDescription !== "");
+  };
+
+  const handleProjectDescriptionChange = (e) => {
+    setProjectDescription(e.target.value);
+    setIsFormValid(projectName !== null && projectName.length >= 3 && e.target.value !== "");
+  };
+
   return (
     <Box sx={{mt:2}}>
         <Box sx={{ width: '100%', display: 'flex', justifyContent:'center', minHeight: '70vh' }}>
@@ -9,20 +19,26 @@ const ProjectDetail = ({projectName, projectDescription, setProjectName, setProj
             <TextField
               label="Project Name"
               value={projectName}
-              onChange={(e) => setProjectName(e.target.value)}
+              onChange={(e) => handleProjectNameChange(e)}
               fullWidth
               required
               sx={{ mt: 5 }}
+              helperText={
+                projectName && projectName.trim().length < 3 ? 'Project name must be at least 3 characters' : ''
+              }
             />
             <TextField
               label="Description"
               value={projectDescription}
-              onChange={(e) => setProjectDescription(e.target.value)}
+              onChange={(e) => handleProjectDescriptionChange(e)}
               fullWidth
               required
               multiline
               rows={16}
               sx={{ mt: 3 }}
+              helperText={
+                projectDescription === '' ? 'Description is required' : ''
+              }
             />
             <Container
               sx={{

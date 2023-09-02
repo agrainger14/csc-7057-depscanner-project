@@ -4,6 +4,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+/**
+ * Error Details to be display response information on bad response
+ */
 @Getter
 @Setter
 @AllArgsConstructor

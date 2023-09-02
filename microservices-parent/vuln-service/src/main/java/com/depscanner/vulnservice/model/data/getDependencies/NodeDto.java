@@ -1,11 +1,16 @@
 package com.depscanner.vulnservice.model.data.getDependencies;
 
 import com.depscanner.vulnservice.model.data.getVersion.DependencyDto;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Set;
 
+/**
+ * DTO representing a node for plotting a node graph.
+ */
 @Data
 @AllArgsConstructor
 @Builder

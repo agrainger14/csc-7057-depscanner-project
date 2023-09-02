@@ -1,6 +1,5 @@
 package com.depscanner.vulnservice.model.data.Response;
 
-import com.depscanner.vulnservice.model.data.getAdvisory.AdvisoryKeyDto;
 import com.depscanner.vulnservice.model.data.getAdvisory.AdvisoryResponse;
 import com.depscanner.vulnservice.model.data.getVersion.DependencyDto;
 import com.depscanner.vulnservice.model.data.getVersion.LinkDto;
@@ -11,7 +10,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor

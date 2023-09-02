@@ -1,7 +1,6 @@
 package com.depscanner.vulnservice.model.data.Response;
 
 import com.depscanner.vulnservice.model.data.getDependencies.EdgeDto;
-import com.depscanner.vulnservice.model.data.getDependencies.NodeDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

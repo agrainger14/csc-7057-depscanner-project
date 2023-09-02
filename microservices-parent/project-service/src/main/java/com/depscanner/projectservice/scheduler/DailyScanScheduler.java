@@ -14,6 +14,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * Component class responsible for scheduling daily vulnerability scans for projects.
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -22,6 +25,10 @@ public class DailyScanScheduler {
     private final ModelMapper modelMapper;
     private final KafkaTemplate<String, VulnScanEvent> kafkaTemplate;
 
+    /**
+     * Scheduled method to initiate daily vulnerability scans for eligible projects.
+     * Runs daily at 2:00 AM (Europe/London timezone).
+     */
     @Scheduled(cron = "0 0 2 * * ?", zone = "Europe/London")
     public void scanDailyProjects() {
         log.info("DAILY SCHEDULER BEGUN");

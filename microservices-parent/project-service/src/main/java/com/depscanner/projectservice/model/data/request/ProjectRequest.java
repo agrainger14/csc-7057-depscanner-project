@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * Data class representing a request to create a project for the user.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

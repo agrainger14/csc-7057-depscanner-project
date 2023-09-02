@@ -1,8 +1,8 @@
 import React from 'react'
 import { Box } from '@mui/material'
-import Header from '../components/Header'
-import Tabs from '../containers/DashboardTabs'
-import Footer from '../components/Footer'
+import Header from '../components/Header/Header'
+import Tabs from '../containers/Dashboard/DashboardTabs'
+import Footer from '../components/Footer/Footer'
 import { OidcSecure } from "@axa-fr/react-oidc";
 
 const Dashboard = () => {

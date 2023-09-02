@@ -14,6 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+/**
+ * Service class responsible for retrieving and managing advisory information.
+ * This service provides methods to read advisory data by advisory key, fetch advisory data from the deps.dev API
+ * and create or update advisory information in the database.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -21,6 +26,13 @@ public class GetAdvisoryService {
     private final Mapper mapper;
     private final AdvisoryKeyRepository advisoryKeyRepository;
 
+    /**
+     * Reads advisory data by the provided advisory key.
+     *
+     * @param advisoryKeyRequest The advisory key DTO containing the identifier for the advisory.
+     * @return An {@link AdvisoryResponse} containing the advisory information.
+     * @throws NoAdvisoryKeyInformationException if no information is available for the requested advisory key.
+     */
     public AdvisoryResponse readByAdvisoryKey(AdvisoryKeyDto advisoryKeyRequest) {
         final String advisoryId = advisoryKeyRequest.getId();
 
@@ -33,6 +45,13 @@ public class GetAdvisoryService {
         return fetchAdvisoryData(advisoryId);
     }
 
+    /**
+     * Fetches advisory data from the deps.dev API by advisory key.
+     *
+     * @param advisoryId The advisory key to fetch data for.
+     * @return An {@link AdvisoryResponse} containing the fetched advisory information.
+     * @throws NoAdvisoryKeyInformationException if no information is available for the requested advisory key.
+     */
     public AdvisoryResponse fetchAdvisoryData(String advisoryId) {
         String getAdvisoryUrl = ApiHelper.buildApiUrl(ApiHelper.GET_ADVISORY_URL, advisoryId);
 
@@ -44,19 +63,20 @@ public class GetAdvisoryService {
         return responseDto;
     }
 
+    /**
+     * Creates or updates advisory data in the database.
+     *
+     * @param advisoryResponse The advisory response containing advisory information to be saved.
+     */
     public void createAdvisoryData(AdvisoryResponse advisoryResponse) {
         Optional<AdvisoryKey> optionalAdvisory = advisoryKeyRepository.findByAdvisoryId
                 (advisoryResponse.getAdvisoryKey().getId());
 
         AdvisoryKey advisoryKey;
 
-        if (optionalAdvisory.isPresent()) {
-            advisoryKey = optionalAdvisory.get();
-        } else {
-            advisoryKey = AdvisoryKey.builder()
-                    .advisoryId(advisoryResponse.getAdvisoryKey().getId())
-                    .build();
-        }
+        advisoryKey = optionalAdvisory.orElseGet(() -> AdvisoryKey.builder()
+                .advisoryId(advisoryResponse.getAdvisoryKey().getId())
+                .build());
 
         AdvisoryDetail advisoryDetail = mapper.mapToAdvisoryDetail(advisoryResponse);
         advisoryKey.setAdvisoryDetail(advisoryDetail);

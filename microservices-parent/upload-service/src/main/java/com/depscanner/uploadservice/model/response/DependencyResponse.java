@@ -6,8 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
+/**
+ * Data class representing a response containing information about an open-source software dependency.
+ */
 @Data
 @Builder
 @AllArgsConstructor

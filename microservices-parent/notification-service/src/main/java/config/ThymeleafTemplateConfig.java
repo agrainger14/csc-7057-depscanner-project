@@ -8,8 +8,17 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Configuration class for Thymeleaf templates used in the application.
+ */
 @Configuration
 public class ThymeleafTemplateConfig {
+
+    /**
+     * Creates and configures a SpringTemplateEngine for processing Thymeleaf templates.
+     *
+     * @return The configured SpringTemplateEngine instance.
+     */
     @Bean
     public SpringTemplateEngine templateEngine() {
         SpringTemplateEngine springTemplateEngine = new SpringTemplateEngine();
@@ -17,6 +26,11 @@ public class ThymeleafTemplateConfig {
         return springTemplateEngine;
     }
 
+    /**
+     * Configures a ClassLoaderTemplateResolver for resolving email related ThymeLeaf templates.
+     *
+     * @return The configured ClassLoaderTemplateResolver instance.
+     */
     @Bean
     public ClassLoaderTemplateResolver emailTemplateResolver() {
         ClassLoaderTemplateResolver emailTemplateResolver = new ClassLoaderTemplateResolver();

@@ -8,6 +8,9 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
 
+/**
+ * Provides controller with the appropriate error details from the specified exception class.
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(NoPackageInformationException.class)

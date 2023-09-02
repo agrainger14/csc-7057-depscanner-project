@@ -2,6 +2,9 @@ package com.depscanner.vulnservice.model.data.getPackage;
 
 import lombok.*;
 
+/**
+ * DTO representing a version (system, name and version).
+ */
 @Data
 @Getter
 @Setter

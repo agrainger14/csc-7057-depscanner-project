@@ -6,6 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents an entity storing information about an open-source software dependency.
+ *
+ * This class encapsulates attributes related to a dependency, including its name, version,
+ * associated build tool system and whether it is considered a development dependency.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

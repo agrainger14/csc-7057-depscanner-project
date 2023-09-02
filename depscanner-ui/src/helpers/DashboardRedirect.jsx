@@ -7,8 +7,6 @@ function DashboardRedirect() {
     React.useEffect(() => {
       navigate('/dashboard/projects');
     }, [navigate]);
-  
-    return null;
 }
 
 export default DashboardRedirect

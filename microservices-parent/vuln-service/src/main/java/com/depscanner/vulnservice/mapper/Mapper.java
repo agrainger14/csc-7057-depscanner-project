@@ -21,8 +21,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+/**
+ * This class serves as a Mapper for converting DTOs to Entity objects
+ * and vice versa. It contains methods for mapping various data structures within the vuln-service DB schema.
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -36,6 +39,12 @@ public class Mapper {
     private final LicenseRepository licenseRepository;
     private final VersionDetailRepository versionDetailRepository;
 
+    /**
+     * Maps an EdgeDto object to an Edge entity.
+     *
+     * @param edge The EdgeDto to be mapped.
+     * @return The corresponding Edge entity.
+     */
     public Edge mapToEdgeEntity(EdgeDto edge) {
         return Edge.builder()
                 .fromNode(edge.getFromNode())
@@ -44,6 +53,12 @@ public class Mapper {
                 .build();
     }
 
+    /**
+     * Maps a NodeDto to a RelatedDependency entity.
+     *
+     * @param nodeDto The NodeDto to be mapped.
+     * @return The corresponding RelatedDependency entity.
+     */
     public RelatedDependency mapToRelatedDependencyEntity(NodeDto nodeDto) {
         return RelatedDependency.builder()
                 .bundled(nodeDto.getBundled())
@@ -53,6 +68,14 @@ public class Mapper {
                 .build();
     }
 
+    /**
+     * Maps the given name, system, and version to a Version entity.
+     *
+     * @param name    The name of the dependency.
+     * @param system  The system of the dependency.
+     * @param version The version of the dependency.
+     * @return The corresponding Version entity.
+     */
     public Version mapToVersionEntity(String name, String system, String version) {
         Optional<Version> versionOptional = versionRepository
                 .findByDependency_NameAndDependency_System_SystemAndVersion(name, system, version);
@@ -69,6 +92,13 @@ public class Mapper {
         return versionEntity;
     }
 
+    /**
+     * Maps the given name and system to a Dependency entity.
+     *
+     * @param name   The name of the dependency.
+     * @param system The system of the dependency.
+     * @return The corresponding Dependency entity.
+     */
     public Dependency mapToDependency(String name, String system) {
         Optional<Dependency> dependencyOptional = dependencyRepository.
                 findByNameAndSystem_System(name, system);
@@ -85,6 +115,12 @@ public class Mapper {
         return dependency;
     }
 
+    /**
+     * Maps the given system to a SystemEntity.
+     *
+     * @param system The system name.
+     * @return The corresponding SystemEntity.
+     */
     public SystemEntity mapToSystemEntity(String system) {
         Optional<SystemEntity> systemEntityOptional = systemRepository.findBySystem(system);
 
@@ -99,6 +135,12 @@ public class Mapper {
         return systemEntity;
     }
 
+    /**
+     * Maps a Version to a RelatedDependencyResponse.
+     *
+     * @param version The Version entity to be mapped.
+     * @return The corresponding RelatedDependencyResponse.
+     */
     public RelatedDependencyResponse mapToRelatedDependencyResponse(Version version) {
         return RelatedDependencyResponse.builder()
                 .dependency(version.getRelatedDependencies().stream()
@@ -108,6 +150,12 @@ public class Mapper {
                 .build();
     }
 
+    /**
+     * Maps a RelatedDependency to a DependencyResponse.
+     *
+     * @param relatedDependency The RelatedDependency entity to be mapped.
+     * @return The corresponding DependencyResponse.
+     */
     public DependencyResponse mapToDependencyResponse(RelatedDependency relatedDependency) {
         return DependencyResponse.builder()
                 .versionKey(mapToVersionKey(relatedDependency.getVersion().getDependency(), relatedDependency.getVersion().getVersion()))
@@ -130,6 +178,12 @@ public class Mapper {
                 .build();
     }
 
+    /**
+     * Maps a Link to a LinkDto.
+     *
+     * @param link The Link entity to be mapped.
+     * @return The corresponding LinkDto.
+     */
     public LinkDto mapToLinkResponse(Link link) {
         return LinkDto.builder()
                 .url(link.getUrl())
@@ -137,10 +191,22 @@ public class Mapper {
                 .build();
     }
 
+    /**
+     * Maps a License to a String representation of the license.
+     *
+     * @param license The License entity to be mapped.
+     * @return The String representation of the license.
+     */
     public String mapToLicenseResponse(License license) {
         return license.getLicense();
     }
 
+    /**
+     * Maps an Edge to an EdgeDto.
+     *
+     * @param edge The Edge entity to be mapped.
+     * @return The corresponding EdgeDto.
+     */
     public EdgeDto mapToEdgeDto(Edge edge) {
         return EdgeDto.builder()
                 .toNode(edge.getToNode())
@@ -149,6 +215,13 @@ public class Mapper {
                 .build();
     }
 
+    /**
+     * Maps a Dependency and version to a DependencyDto.
+     *
+     * @param dependency The Dependency entity to be mapped.
+     * @param version    The version of the dependency.
+     * @return The corresponding DependencyDto.
+     */
     public DependencyDto mapToVersionKey(Dependency dependency, String version) {
         return DependencyDto.builder()
                 .name(dependency.getName())
@@ -157,7 +230,12 @@ public class Mapper {
                 .build();
     }
 
-
+    /**
+     * Maps an AdvisoryKey to an AdvisoryResponse.
+     *
+     * @param advisoryKey The AdvisoryKey entity to be mapped.
+     * @return The corresponding AdvisoryResponse.
+     */
     public AdvisoryResponse mapToAdvisoryResponse(AdvisoryKey advisoryKey) {
         return AdvisoryResponse.builder()
                 .advisoryKey(mapToAdvisoryKey(advisoryKey.getAdvisoryId()))
@@ -169,28 +247,43 @@ public class Mapper {
                 .build();
     }
 
+    /**
+     * Maps an AdvisoryId to an AdvisoryKeyDto.
+     *
+     * @param advisoryId The AdvisoryId to be mapped.
+     * @return The corresponding AdvisoryKeyDto.
+     */
     public AdvisoryKeyDto mapToAdvisoryKey(String advisoryId) {
         return AdvisoryKeyDto.builder()
                 .id(advisoryId)
                 .build();
     }
 
+    /**
+     * Maps an AdvisoryResponse to an AdvisoryDetail.
+     *
+     * @param advisoryResponse The AdvisoryResponse to be mapped.
+     * @return The corresponding AdvisoryDetail.
+     */
     public AdvisoryDetail mapToAdvisoryDetail(AdvisoryResponse advisoryResponse) {
         Optional<AdvisoryDetail> advisoryDetailOptional = advisoryDetailRepository.findByUrl(advisoryResponse.getUrl());
 
-        if (advisoryDetailOptional.isPresent()) {
-            return advisoryDetailOptional.get();
-        }
-
-        return AdvisoryDetail.builder()
+        return advisoryDetailOptional.orElseGet(() -> AdvisoryDetail.builder()
                 .cvss3Score(advisoryResponse.getCvss3Score())
                 .cvss3Vector(advisoryResponse.getCvss3Vector())
                 .title(advisoryResponse.getTitle())
                 .url(advisoryResponse.getUrl())
                 .aliases(advisoryResponse.getAliases())
-                .build();
+                .build());
+
     }
 
+    /**
+     * Maps a Dependency to a PackageResponseDto.
+     *
+     * @param dependency The Dependency entity to be mapped.
+     * @return The corresponding PackageResponseDto.
+     */
     public PackageResponseDto mapToPackageResponse(Dependency dependency) {
         return PackageResponseDto.builder()
                 .packageKey(mapToPackageKey(dependency))
@@ -201,6 +294,12 @@ public class Mapper {
                 .build();
     }
 
+    /**
+     * Maps a Dependency to a PackageKeyDto.
+     *
+     * @param dependency The Dependency entity to be mapped.
+     * @return The corresponding PackageKeyDto.
+     */
     public PackageKeyDto mapToPackageKey(Dependency dependency) {
         return PackageKeyDto.builder()
                 .name(dependency.getName())
@@ -208,6 +307,12 @@ public class Mapper {
                 .build();
     }
 
+    /**
+     * Maps a Version to a VersionDto.
+     *
+     * @param version The Version entity to be mapped.
+     * @return The corresponding VersionDto.
+     */
     public VersionDto mapToVersionDto(Version version) {
         return VersionDto.builder()
                 .versionKey(mapToVersionKeyDto(version))
@@ -216,6 +321,12 @@ public class Mapper {
                 .build();
     }
 
+    /**
+     * Maps a Version to a VersionKeyDto.
+     *
+     * @param version The Version entity to be mapped.
+     * @return The corresponding VersionKeyDto.
+     */
     public VersionKeyDto mapToVersionKeyDto(Version version) {
         return VersionKeyDto.builder()
                 .name(version.getDependency().getName())
@@ -224,6 +335,12 @@ public class Mapper {
                 .build();
     }
 
+    /**
+     * Maps a PackageResponseDto to a Dependency entity.
+     *
+     * @param responseDto The PackageResponseDto to be mapped.
+     * @return The corresponding Dependency entity.
+     */
     public Dependency mapToDependency(PackageResponseDto responseDto) {
         Dependency dependency = Dependency.builder()
                 .name(responseDto.getPackageKey().getName())
@@ -238,6 +355,13 @@ public class Mapper {
         return dependency;
     }
 
+    /**
+     * Maps a VersionDto and Dependency to a Version entity.
+     *
+     * @param versionDto  The VersionDto to be mapped.
+     * @param dependency  The corresponding Dependency entity.
+     * @return The corresponding Version entity.
+     */
     public Version mapToDependencyVersion(VersionDto versionDto, Dependency dependency) {
         Optional<Version> versionOptional = versionRepository
                 .findByDependency_NameAndDependency_System_SystemAndVersion
@@ -245,35 +369,53 @@ public class Mapper {
 
         if (versionOptional.isPresent()) {
             return versionOptional.get();
-        } else {
-            Version version = Version.builder()
-                    .dependency(dependency)
-                    .version(versionDto.getVersionKey().getVersion())
-                    .build();
-            version.setVersionDetail(mapToVersionDetail(versionDto, version));
-            return version;
         }
+
+        Version version = Version.builder()
+                .dependency(dependency)
+                .version(versionDto.getVersionKey().getVersion())
+                .build();
+        version.setVersionDetail(mapToVersionDetail(versionDto, version));
+        return version;
     }
 
+    /**
+     * Maps a VersionDto and Version to a VersionDetail entity.
+     *
+     * @param versionDto The VersionDto to be mapped.
+     * @param version    The corresponding Version entity.
+     * @return The corresponding VersionDetail entity.
+     */
     public VersionDetail mapToVersionDetail(VersionDto versionDto, Version version) {
         Optional<VersionDetail> versionDetailOptional = versionDetailRepository.findByVersion(version);
 
-        if (versionDetailOptional.isPresent()) {
-            return versionDetailOptional.get();
-        }
-
-        return VersionDetail.builder()
+        return versionDetailOptional.orElseGet(() -> VersionDetail.builder()
                 .version(version)
                 .publishedAt(versionDto.getPublishedAt())
                 .isDefault(Boolean.valueOf(versionDto.getIsDefault()))
-                .build();
+                .build());
+
     }
 
+    /**
+     * Maps a system name to a SystemEntity.
+     *
+     * @param system The system name to be mapped.
+     * @return The corresponding SystemEntity.
+     */
     public SystemEntity mapToSystem(String system) {
         return systemRepository.findBySystem(system)
                 .orElseGet(() -> SystemEntity.builder().system(system).build());
     }
 
+    /**
+     * Maps name, system, and version to a VulnCheckResponse with isDataAvailable set to false.
+     *
+     * @param name    The name of the dependency.
+     * @param system  The system of the dependency.
+     * @param version The version of the dependency.
+     * @return The corresponding VulnCheckResponse.
+     */
     public VulnCheckResponse mapToVulnCheckResponse(String name, String system, String version) {
         return VulnCheckResponse.builder()
                 .name(name)
@@ -283,6 +425,12 @@ public class Mapper {
                 .build();
     }
 
+    /**
+     * Maps a Version entity to a VulnCheckResponse with isDataAvailable set to true.
+     *
+     * @param dependencyVersion The Version entity to be mapped.
+     * @return The corresponding VulnCheckResponse.
+     */
     public VulnCheckResponse mapToVulnCheckResponse(Version dependencyVersion) {
         return VulnCheckResponse.builder()
                 .name(dependencyVersion.getDependency().getName())
@@ -292,44 +440,13 @@ public class Mapper {
                 .build();
     }
 
-    public VersionsResponseDto mapToDependencyResponse(Version version) {
-        return VersionsResponseDto.builder()
-                .versionKey(mapToVersionKey(version))
-                .isDefault(version.getVersionDetail().getIsDefault())
-                .licenses(version.getLicenses().stream()
-                        .map(this::mapToLicenseResponse)
-                        .toList())
-                .advisoryKeys(version.getAdvisoryKeys().stream()
-                        .map(this::mapToAdvisoryKeyDto)
-                        .toList())
-                .links(version.getLinks().stream()
-                        .map(this::mapToLinkDto)
-                        .toList())
-                .publishedAt(version.getVersionDetail().getPublishedAt())
-                .build();
-    }
-
-    public LinkDto mapToLinkDto(Link link) {
-        return LinkDto.builder()
-                .label(link.getLabel())
-                .url(link.getUrl())
-                .build();
-    }
-
-    public AdvisoryKeyDto mapToAdvisoryKeyDto(AdvisoryKey advisoryKey) {
-        return AdvisoryKeyDto.builder()
-                .id(advisoryKey.getAdvisoryId())
-                .build();
-    }
-
-    public DependencyDto mapToVersionKey(Version version) {
-        return DependencyDto.builder()
-                .name(version.getDependency().getName())
-                .version(version.getVersion())
-                .system(version.getDependency().getSystem().getSystem())
-                .build();
-    }
-
+    /**
+     * Maps a VersionsResponseDto and Version to a VersionDetail entity.
+     *
+     * @param versionsResponseDto The VersionsResponseDto to be mapped.
+     * @param version             The corresponding Version entity.
+     * @return The corresponding VersionDetail entity.
+     */
     public VersionDetail mapToVersionDetail(VersionsResponseDto versionsResponseDto, Version version) {
         return VersionDetail.builder()
                 .isDefault(versionsResponseDto.getIsDefault())
@@ -338,6 +455,12 @@ public class Mapper {
                 .build();
     }
 
+    /**
+     * Maps a license string to a License entity.
+     *
+     * @param licenseDto The license string to be mapped.
+     * @return The corresponding License entity.
+     */
     public License mapToLicenseEntity(String licenseDto) {
         Optional<License> licenseOptional = licenseRepository.findByLicense(licenseDto);
 
@@ -346,6 +469,12 @@ public class Mapper {
                 .build());
     }
 
+    /**
+     * Maps an AdvisoryKeyDto to an AdvisoryKey entity.
+     *
+     * @param advisoryKeyDto The AdvisoryKeyDto to be mapped.
+     * @return The corresponding AdvisoryKey entity.
+     */
     public AdvisoryKey mapToAdvisoryKeyEntity(AdvisoryKeyDto advisoryKeyDto) {
         Optional<AdvisoryKey> advisoryKeyOptional = advisoryKeyRepository.findByAdvisoryId(advisoryKeyDto.getId());
 
@@ -354,6 +483,12 @@ public class Mapper {
                 .build());
     }
 
+    /**
+     * Maps a LinkDto to a Link entity.
+     *
+     * @param linkDto The LinkDto to be mapped.
+     * @return The corresponding Link entity.
+     */
     public Link mapToLinkEntity(LinkDto linkDto) {
         Optional<Link> linkOptional = linkRepository.findByLabelAndUrl(linkDto.getLabel(), linkDto.getUrl());
         return linkOptional.orElseGet(() -> Link.builder().label(linkDto.getLabel()).url(linkDto.getUrl()).build());

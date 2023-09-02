@@ -3,11 +3,12 @@ import Home from './pages/Home';
 import About from './pages/About';
 import Dashboard from './pages/Dashboard';
 import Project from './pages/Project';
-import UserProjects from './containers/UserProjects';
-import AddProject from './containers/AddProject';
+import UserProjects from './containers/Project/UserProjects';
+import AddProject from './containers/Project/AddProject';
 import Dependency from './pages/Dependency';
 import Advisory from './pages/Advisory';
 import DashboardRedirect from './helpers/DashboardRedirect';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="projects" element={<UserProjects />} />
         <Route path="add-project" element={<AddProject />} />
       </Route>
+      <Route path="/404" element={<NotFound />} />
     </Routes>
   )
 }

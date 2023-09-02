@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Data class representing a request to update scanning schedule for a user project.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

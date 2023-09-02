@@ -5,6 +5,13 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+/**
+ * Represents details of an open-source dependency version, including its unique identifier,
+ * associated version, publication date, and a flag indicating if it is the default version.
+ *
+ * This entity class is used to store information about a dependency versions details,
+ * such as its unique identifier, the date it was published, and whether it is marked as the default version.
+ */
 @Entity
 @Builder
 @NoArgsConstructor

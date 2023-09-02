@@ -25,7 +25,6 @@ import static org.mockito.Mockito.when;
 public class NpmParserTest {
     @Mock
     private MultipartFile multipartFile;
-
     private NpmParser npmParser;
 
     @BeforeEach

@@ -2,6 +2,9 @@ package com.depscanner.notificationservice.event;
 
 import lombok.*;
 
+/**
+ * DTO representing a dependency.
+ */
 @Data
 @Getter
 @Setter

@@ -115,7 +115,7 @@ public class MavenParser implements BuildToolParser {
      */
     public Set<DependencyEntity> parseMavenDependencies(Model model) {
         Set<DependencyEntity> dependencies = Optional.ofNullable(model.getDependencies())
-                .map(deps -> deps.stream()
+                .map(dep -> dep.stream()
                         .map(this::buildMavenDependency)
                         .peek(dependency -> handleVersionPlaceholder(dependency, model))
                         .collect(Collectors.toSet())
@@ -133,8 +133,8 @@ public class MavenParser implements BuildToolParser {
      * Handles the version placeholders in the dependency version and resolves them using properties defined in the pom
      * if available.
      *
-     * @param dependency
-     * @param model
+     * @param dependency - the dependency with a version that needs to be retrieved
+     * @param model - the model which contains the version within the properties
      */
     private void handleVersionPlaceholder(DependencyEntity dependency, Model model) {
         Properties properties = model.getProperties();
@@ -178,8 +178,8 @@ public class MavenParser implements BuildToolParser {
     /**
      * Resolves the version of the dependency by searching for it in the parent pom and its managed dependencies.
      * It also resolves property and import scoped versions by looking up the version from the pom properties/scope.
-     * @param dependency
-     * @param model
+     * @param dependency - the dependency with the version to get
+     * @param model - the initial model parent from the file upload
      */
     public void getDependencyVersion(DependencyEntity dependency, Model model) {
         Parent parent = model.getParent();
@@ -326,11 +326,11 @@ public class MavenParser implements BuildToolParser {
         try (InputStream inputStream = new URI(apiUrl).toURL().openStream()) {
             return reader.read(inputStream);
         } catch (URISyntaxException | XmlPullParserException e) {
-            log.error("Error parsing model from url: {}", apiUrl, e.getMessage());
+            log.error("Error parsing model from url: {}", apiUrl);
         } catch (FileNotFoundException e) {
-            log.error("POM file not found at maven repo: {}", apiUrl, e.getMessage());
+            log.error("POM file not found at maven repo: {}", apiUrl);
         } catch (IOException e) {
-            log.error("Error reading model from maven repo: {}", apiUrl, e.getMessage());
+            log.error("Error reading model from maven repo: {}", apiUrl);
         }
         return null;
     }

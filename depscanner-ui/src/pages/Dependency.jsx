@@ -1,8 +1,8 @@
 import React from 'react'
 import { Box } from '@mui/material'
-import Header from '../components/Header'
-import Footer from '../components/Footer'
-import DependencyDetail from '../containers/DependencyDetail'
+import Header from '../components/Header/Header'
+import Footer from '../components/Footer/Footer'
+import DependencyDetail from '../containers/Dependency/DependencyDetail'
 import { DependencyDataProvider } from '../context/DependencyDataContext'
 
 const Dependency = () => {

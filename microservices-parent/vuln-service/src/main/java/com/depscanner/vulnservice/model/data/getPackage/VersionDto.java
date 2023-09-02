@@ -4,6 +4,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+/**
+ * DTO representing a version with published at date/time and if the version is the latest version.
+ */
 @Data
 @Getter
 @Setter

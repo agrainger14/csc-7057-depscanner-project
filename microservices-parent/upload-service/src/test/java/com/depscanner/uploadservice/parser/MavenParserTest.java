@@ -22,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -37,7 +36,7 @@ public class MavenParserTest {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        Map<String, Model> modelMap = new ConcurrentHashMap<>();
+        Map<String, Model> modelMap = new HashMap<>();
         mavenParser = new MavenParser(reader, modelMap);
     }
 

@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+/**
+ * Data class representing a response for a project.
+ */
 @Data
 public class ProjectResponse {
     private String id;

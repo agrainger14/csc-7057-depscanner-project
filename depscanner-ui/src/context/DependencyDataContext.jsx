@@ -1,7 +1,8 @@
 import React, { createContext, useRef } from 'react'
-import LoadingSpinner from "../components/LoadingSpinner";
+import LoadingSpinner from "../components/Loading/LoadingSpinner";
 import { useParams } from 'react-router-dom';
 import { axiosDefault } from '../utils/axios';
+import { useNavigate } from 'react-router-dom';
 
 const DependencyDataContext = createContext();
 
@@ -11,6 +12,7 @@ export const DependencyDataProvider = ({ children }) => {
   const { name, system, version } = params;
   const [dependencyData, setDependencyData] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     setIsLoading(true);
@@ -31,6 +33,7 @@ export const DependencyDataProvider = ({ children }) => {
             console.log(res.data);
             setDependencyData(res.data);
         } catch (err) {
+          navigate('/404');
           console.log(err);
         } finally {
           setIsLoading(false);

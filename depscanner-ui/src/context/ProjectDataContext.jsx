@@ -1,5 +1,5 @@
 import React, { createContext } from "react";
-import LoadingSpinner from "../components/LoadingSpinner";
+import LoadingSpinner from "../components/Loading/LoadingSpinner";
 import { axiosDefault } from "../utils/axios";
 import { useOidcIdToken } from "@axa-fr/react-oidc";
 
@@ -13,6 +13,11 @@ export const ProjectDataProvider = ({ children }) => {
     const [successDeleteProject, setSuccessDeleteProject] = React.useState(false);
     const { idToken } = useOidcIdToken();
     const controller = new AbortController();
+    const [currentPage, setCurrentPage] = React.useState(1);
+
+    const projectsPerPage = 5;
+    const startIndex = (currentPage - 1) * projectsPerPage;
+    const endIndex = startIndex + projectsPerPage;
 
     const headers = {
       'Authorization': 'Bearer ' + idToken
@@ -49,6 +54,7 @@ export const ProjectDataProvider = ({ children }) => {
         const projects = projectData.filter(project => project.id !== id);
         setProjectData(projects);
         setSuccessDeleteProject(true);
+        handlePageOnProjectDelete(projects);
       } catch (err) {
         setErrorSnackbarOpen(true);
         console.log(err)
@@ -56,6 +62,12 @@ export const ProjectDataProvider = ({ children }) => {
 
       return () => {
         controller.abort();
+      }
+    }
+
+    const handlePageOnProjectDelete = (projects) => {
+      if (startIndex >= projects.length && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
       }
     }
 
@@ -91,8 +103,12 @@ export const ProjectDataProvider = ({ children }) => {
       }
     }
 
+    const handlePageChange = (newPage) => {
+      setCurrentPage(newPage);
+    }
+
     return (
-      <ProjectDataContext.Provider value={{ projectData, handleDelete, setProjectData, patchScanSchedule, successSnackbarOpen, setSuccessSnackbarOpen, errorSnackbarOpen, setErrorSnackbarOpen, setSuccessDeleteProject }}>
+      <ProjectDataContext.Provider value={{ projectData, handleDelete, setProjectData, patchScanSchedule, successSnackbarOpen, setSuccessSnackbarOpen, errorSnackbarOpen, setErrorSnackbarOpen, setSuccessDeleteProject, currentPage, handlePageChange, projectsPerPage, startIndex, endIndex }}>
         {isLoading ? <LoadingSpinner /> : children}
       </ProjectDataContext.Provider>
     );

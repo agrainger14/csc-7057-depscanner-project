@@ -2,7 +2,6 @@ package com.depscanner.projectservice.model.data.response;
 
 import com.depscanner.projectservice.model.data.dto.DependencyDto;
 import com.depscanner.projectservice.model.enumeration.ProjectType;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +10,10 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
+/**
+ * Data class representing a response containing additional information relating to a user project.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

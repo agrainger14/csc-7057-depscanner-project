@@ -4,6 +4,9 @@ import lombok.*;
 
 import java.util.List;
 
+/**
+ * Data class representing a vulnerable dependency along with associated advisory keys.
+ */
 @Data
 @Getter
 @Setter

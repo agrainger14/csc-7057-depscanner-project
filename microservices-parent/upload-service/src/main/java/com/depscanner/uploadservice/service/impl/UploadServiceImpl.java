@@ -2,8 +2,8 @@ package com.depscanner.uploadservice.service.impl;
 
 import com.depscanner.uploadservice.exception.InvalidFileException;
 import com.depscanner.uploadservice.model.entity.DependencyEntity;
-import com.depscanner.uploadservice.model.response.DependencyResponse;
 import com.depscanner.uploadservice.model.enumeration.BuildToolType;
+import com.depscanner.uploadservice.model.response.DependencyResponse;
 import com.depscanner.uploadservice.parser.BuildToolParser;
 import com.depscanner.uploadservice.parser.BuildToolParserFactory;
 import com.depscanner.uploadservice.service.UploadService;

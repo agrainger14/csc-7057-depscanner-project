@@ -5,17 +5,13 @@ import com.depscanner.vulnservice.event.AdvisoryFoundEvent;
 import com.depscanner.vulnservice.event.VulnDependency;
 import com.depscanner.vulnservice.event.VulnScanEvent;
 import com.depscanner.vulnservice.exception.InvalidUrlException;
-import com.depscanner.vulnservice.model.data.getAdvisory.AdvisoryKeyDto;
-import com.depscanner.vulnservice.model.data.getAdvisory.AdvisoryResponse;
-import com.depscanner.vulnservice.model.data.getVersion.DependencyDto;
 import com.depscanner.vulnservice.model.data.getDependencies.DependencyGraphResponseDto;
+import com.depscanner.vulnservice.model.data.getVersion.DependencyDto;
 import com.depscanner.vulnservice.model.data.getVersion.VersionsResponseDto;
-import com.depscanner.vulnservice.service.GetAdvisoryService;
 import com.depscanner.vulnservice.service.GetDependenciesService;
 import com.depscanner.vulnservice.service.GetVersionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -23,16 +19,23 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+/**
+ * Kafka listener component that scans for vulnerabilities and processes dependency information.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class VulnScanListener {
     private final GetDependenciesService getDependenciesService;
     private final GetVersionService getVersionService;
-    private final GetAdvisoryService getAdvisoryService;
 
     private final KafkaTemplate<String, AdvisoryFoundEvent> kafkaTemplate;
 
+    /**
+     * Kafka listener method that scans for vulnerabilities based on the received VulnScanEvent.
+     *
+     * @param vulnScanEvent The event containing vulnerability scan information.
+     */
     @KafkaListener(topics = "project-vuln-scan-topic")
     public void scanForVulnerabilities(VulnScanEvent vulnScanEvent) {
         log.info("Scanning new project with dependency count -> " + vulnScanEvent.getDependencies().size());
@@ -41,7 +44,7 @@ public class VulnScanListener {
 
         log.info("PROCESSING COMPLETE...");
 
-        if (vulnDependencySet != null) {
+        if (!vulnDependencySet.isEmpty()) {
             log.info("Vulnerable dependencies detected in project... passing to notification service");
             AdvisoryFoundEvent advisoryFoundEvent = new AdvisoryFoundEvent(vulnScanEvent.getUserEmail(),
                     vulnScanEvent.getProjectResponse(), vulnDependencySet);
@@ -49,14 +52,20 @@ public class VulnScanListener {
         }
     }
 
+    /**
+     * Processes the list of dependencies for vulnerabilities.
+     *
+     * @param dependencies The list of DependencyDto objects representing project dependencies.
+     * @return A set of VulnDependency objects containing vulnerability information.
+     */
     @Transactional
     public Set<VulnDependency> processDependency(List<DependencyDto> dependencies) {
         Set<VulnDependency> vulnDependencyList = new HashSet<>();
         Set<DependencyDto> visitedDependencies = new HashSet<>();
-        Deque<DependencyDto> dependencyStack = new ArrayDeque<>(dependencies);
+        Deque<DependencyDto> dependencyDeque = new ArrayDeque<>(dependencies);
 
-        while (!dependencyStack.isEmpty()) {
-            DependencyDto currentDependency = dependencyStack.pop();
+        while (!dependencyDeque.isEmpty()) {
+            DependencyDto currentDependency = dependencyDeque.pop();
 
             String name = currentDependency.getName();
             String version = currentDependency.getVersion();
@@ -78,13 +87,20 @@ public class VulnScanListener {
             if (dependencies.contains(currentDependency)) {
                 List<DependencyDto> dependencyDependenciesList = getDependencyDependencies
                         (currentDependency.getSystem(), currentDependency.getVersion(), currentDependency.getName());
-                dependencyStack.addAll(dependencyDependenciesList);
+                dependencyDeque.addAll(dependencyDependenciesList);
             }
         }
         return vulnDependencyList;
     }
 
 
+    /**
+     * Adds vulnerability information to an existing or new VulnDependency object.
+     *
+     * @param dependency           The DependencyDto for which vulnerabilities are being added.
+     * @param vulnDependencyList   The set of VulnDependency objects to be updated.
+     * @param dependencyVersionData The VersionsResponseDto containing version and advisory information.
+     */
     private void addVulnDependency(DependencyDto dependency, Set<VulnDependency> vulnDependencyList, VersionsResponseDto dependencyVersionData) {
         Optional<VulnDependency> vulnDependencyOptional = vulnDependencyList.stream()
                 .filter(vulnDependency -> vulnDependency.getDependency().equals(dependency))
@@ -102,6 +118,14 @@ public class VulnScanListener {
         }
     }
 
+    /**
+     * Retrieves the list of dependencies for a specific dependency version.
+     *
+     * @param system  The system of the dependency.
+     * @param version The version of the dependency.
+     * @param name    The name of the dependency.
+     * @return A list of DependencyDto objects representing the dependencies of the given dependency version.
+     */
     private List<DependencyDto> getDependencyDependencies(String system, String version, String name) {
         String getDependenciesUrl = ApiHelper.buildApiUrl(ApiHelper.GET_DEPENDENCY_URL,
                 system, ApiHelper.percentEncodeParam(name), version);
@@ -123,6 +147,12 @@ public class VulnScanListener {
                 .orElse(Collections.emptyList());
     }
 
+    /**
+     * Retrieves version information for a specific dependency.
+     *
+     * @param dependency The DependencyDto object representing the dependency.
+     * @return The VersionsResponseDto containing version information and advisories.
+     */
     public VersionsResponseDto getVersionData(DependencyDto dependency) {
         String getVersionUrl = ApiHelper.buildApiUrl(ApiHelper.GET_VERSION_URL,
                 dependency.getSystem(), ApiHelper.percentEncodeParam(dependency.getName()),
@@ -138,6 +168,12 @@ public class VulnScanListener {
         return versionsResponseDto;
     }
 
+    /**
+     * Checks if a given API URL is valid.
+     *
+     * @param apiUrl The API URL to be checked for validity.
+     * @throws InvalidUrlException If the URL contains placeholders or variables.
+     */
     private void isUrlValid(String apiUrl) {
         if (apiUrl.contains("$") || apiUrl.contains("{")) {
             throw new InvalidUrlException("Invalid URL passed! Check request params.");

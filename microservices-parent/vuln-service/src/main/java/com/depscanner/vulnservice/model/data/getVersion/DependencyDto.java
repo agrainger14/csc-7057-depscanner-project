@@ -1,7 +1,13 @@
 package com.depscanner.vulnservice.model.data.getVersion;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+/**
+ * DTO representing a dependency (system, name and version).
+ */
 @Data
 @AllArgsConstructor
 @Builder

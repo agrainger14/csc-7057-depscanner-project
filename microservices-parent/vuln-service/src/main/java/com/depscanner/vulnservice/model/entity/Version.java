@@ -27,13 +27,13 @@ public class Version {
     @JoinColumn(name = "version_detail_id")
     private VersionDetail versionDetail;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<License> licenses;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<AdvisoryKey> advisoryKeys;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<Link> links;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -41,12 +41,13 @@ public class Version {
             name = "version_edge",
             joinColumns = @JoinColumn(name = "version_id"),
             inverseJoinColumns = @JoinColumn(name = "edge_id"))
-    private List<Edge> edges = new LinkedList<>();;
+    private List<Edge> edges = new LinkedList<>();
 
-    @ManyToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST }, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     @JoinTable(
             name = "version_related_dependency",
             joinColumns = @JoinColumn(name = "version_id"),
             inverseJoinColumns = @JoinColumn(name = "related_version_id"))
     private List<RelatedDependency> relatedDependencies = new LinkedList<>();
 }
+

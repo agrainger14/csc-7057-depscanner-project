@@ -5,6 +5,12 @@ import lombok.*;
 
 import java.util.List;
 
+/**
+ * Represents an open-source dependency, including its name, associated system, and versions.
+ *
+ * This entity class stores information about a software dependency, such as its unique identifier,
+ * name, the associated system it belongs to and a list of versions related to this dependency.
+ */
 @Entity
 @Builder
 @NoArgsConstructor
@@ -25,3 +31,4 @@ public class Dependency {
     @OneToMany(mappedBy = "dependency", cascade = CascadeType.ALL)
     private List<Version> versions;
 }
+

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Typography, Select, FormControl, InputLabel, MenuItem, Button } from '@mui/material'
+import { Box, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Typography, Select, FormControl, InputLabel, MenuItem, Button, Tooltip } from '@mui/material'
 import { axiosDefault } from '../../utils/axios';
 
 const ReviewTable = ({ projectDependencies, setProjectDependencies, setEnableNext }) => {
@@ -18,10 +18,11 @@ const ReviewTable = ({ projectDependencies, setProjectDependencies, setEnableNex
         const controller = new AbortController();
 
         try {
-            await axiosDefault.get(`/vuln/versions?name=${dependencyName}&system=${dependencySystem}`, {
+            const res = await axiosDefault.get(`/vuln/versions?name=${dependencyName}&system=${dependencySystem}`, {
                 signal: controller.signal
             })
-            setDependencyVersions(res.data.versions)
+            const sortedVersions = sortVersionsByVersionKey(res.data.versions);
+            setDependencyVersions(sortedVersions);
         } catch (err) {
             console.log(err);
         }
@@ -54,6 +55,23 @@ const ReviewTable = ({ projectDependencies, setProjectDependencies, setEnableNex
         allVersionsSet ? setEnableNext(true) : setEnableNext(false);
     }
 
+    function sortVersionsByVersionKey(versions) {
+        return versions.sort((a, b) => {
+            const versionA = a.versionKey.version.split('.').map(Number);
+            const versionB = b.versionKey.version.split('.').map(Number);
+    
+            for (let i = 0; i < Math.max(versionA.length, versionB.length); i++) {
+                const partA = versionA[i] || 0;
+                const partB = versionB[i] || 0;
+    
+                if (partA !== partB) {
+                    return partB - partA;
+                }
+            }
+            return 0;
+        });
+    }
+
   return (
     <Box>
         <Box sx={{mt:2, display: 'flex', justifyContent:'center' }}>
@@ -81,6 +99,13 @@ const ReviewTable = ({ projectDependencies, setProjectDependencies, setEnableNex
                                 Version Detected
                             </Typography>
                         </TableCell>
+                        {projectDependencies && projectDependencies[0].system === "NPM" &&
+                        <TableCell>
+                            <Typography variant="body1">
+                                devDependency
+                            </Typography>
+                        </TableCell>
+                        }
                         <TableCell>
                             <Typography variant="body1">Actions</Typography>
                         </TableCell>
@@ -123,14 +148,28 @@ const ReviewTable = ({ projectDependencies, setProjectDependencies, setEnableNex
                                         </FormControl>
                                     </TableCell>
                                 )}
+                                {dependency.system === "NPM" &&
                                 <TableCell>
+                                    {dependency.isDevDependency ? "Yes" : dependency.isDevDependency ===  null ? "N/A" : "No"}
+                                </TableCell>
+                                }
+                                <TableCell>
+                                <Tooltip
+                                    title="Project must have at least one dependency"
+                                    placement="top"
+                                    disableHoverListener={projectDependencies.length !== 1}
+                                >
+                                    <span>
                                 <Button
                                     variant="contained"
                                     color="primary"
                                     onClick={() => handleDeleteDependency(index)}
+                                    disabled={projectDependencies.length === 1}
                                 >
                                     Delete
                                 </Button>
+                                </span>
+                                </Tooltip>
                                 </TableCell>
                             </TableRow>
                         )

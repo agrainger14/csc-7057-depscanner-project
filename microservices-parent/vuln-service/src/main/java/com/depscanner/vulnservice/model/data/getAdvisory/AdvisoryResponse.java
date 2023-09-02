@@ -1,9 +1,15 @@
 package com.depscanner.vulnservice.model.data.getAdvisory;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
+/**
+ * Represents a deps.dev API response object containing advisory information.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

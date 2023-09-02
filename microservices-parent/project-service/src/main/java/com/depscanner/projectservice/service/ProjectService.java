@@ -2,17 +2,19 @@ package com.depscanner.projectservice.service;
 
 import brave.Span;
 import brave.Tracer;
-import com.depscanner.projectservice.exception.*;
+import com.depscanner.projectservice.event.VulnScanEvent;
+import com.depscanner.projectservice.exception.NoDependencyByIdException;
+import com.depscanner.projectservice.exception.NoProjectByIdException;
+import com.depscanner.projectservice.exception.NoUserProjectsException;
+import com.depscanner.projectservice.exception.UserNotAuthorisedException;
 import com.depscanner.projectservice.model.data.dto.DependencyDto;
-import com.depscanner.projectservice.model.data.request.DependencyRequest;
 import com.depscanner.projectservice.model.data.request.ProjectRequest;
 import com.depscanner.projectservice.model.data.request.ScanUpdateRequest;
 import com.depscanner.projectservice.model.data.response.*;
-import com.depscanner.projectservice.event.VulnScanEvent;
-import com.depscanner.projectservice.model.enumeration.ProjectType;
-import com.depscanner.projectservice.repository.ProjectRepository;
 import com.depscanner.projectservice.model.entity.DependencyEntity;
 import com.depscanner.projectservice.model.entity.ProjectEntity;
+import com.depscanner.projectservice.model.enumeration.ProjectType;
+import com.depscanner.projectservice.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -26,7 +28,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * ProjectService is a service class responsible for managing user projects.
+ * Service class for handling user projects.
  */
 @Service
 @RequiredArgsConstructor
@@ -70,7 +72,7 @@ public class ProjectService {
                         .build())
                 .toList();
 
-        userProjectsResponses.forEach(userProjectResponse -> vulnerableDependencyCount(userProjectResponse));
+        userProjectsResponses.forEach(this::vulnerableDependencyCount);
         return userProjectsResponses;
     }
 
@@ -93,7 +95,7 @@ public class ProjectService {
         Span vulnServiceCheckLookup = tracer.nextSpan().name("VulnServiceCheckLookup");
 
         //data is posted in a request body to prevent repeat API calls to the vuln-service
-        try (Tracer.SpanInScope spanInScope = tracer.withSpanInScope(vulnServiceCheckLookup.start())) {
+        try (Tracer.SpanInScope ignored = tracer.withSpanInScope(vulnServiceCheckLookup.start())) {
             DependencyResponse[] dependencyResponseArray = webClient.build().post()
                     .uri("http://vuln-service/check")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -103,7 +105,7 @@ public class ProjectService {
                     .block();
 
             //create map of vulnerable dependency keys (with isDataAvailable flag)
-            Map<String, Boolean> vulnerableDependenciesMap = Arrays.stream(dependencyResponseArray)
+            Map<String, Boolean> vulnerableDependenciesMap = Arrays.stream(Objects.requireNonNull(dependencyResponseArray))
                 .collect(Collectors.toMap(
                         response -> response.getName() + response.getVersion() + response.getSystem(),
                         DependencyResponse::getIsDataAvailable)
@@ -118,7 +120,7 @@ public class ProjectService {
                     //if present in the map from the response, the dependency is vulnerable.
                     dependency.setIsVulnerable(true);
                     vulnerableDependencyCount++;
-                } else if (isDataAvailable != null && !isDataAvailable) {
+                } else if (isDataAvailable != null) {
                     //if the key is present, but the value is false there is no information available, set to null.
                     dependency.setIsVulnerable(null);
                 } else {
@@ -159,16 +161,16 @@ public class ProjectService {
      * @return The ProjectResponse object representing the newly created project.
      */
     public UserProjectResponse createUserProject(ProjectRequest projectRequest) {
+        // get user email from auth realm
         String userEmail = authService.getAuthEmail();
 
-        //model mapper prevents some unneeded map methods
+        // model mapper prevents unneeded map methods
         ProjectEntity project = modelMapper.map(projectRequest, ProjectEntity.class);
-
         project.setEmail(userEmail);
         project.setProjectType(ProjectType.fromSystem(projectRequest.getDependencies().get(0).getSystem()));
         project.setProjectDependenciesCount(projectRequest.getDependencies().size());
 
-        //set dependencies, creates unique ID for each dependency
+        // set dependencies, creates unique ID for each dependency
         project.setDependencies(projectRequest.getDependencies()
                 .stream()
                 .map(dependency -> {
@@ -178,27 +180,34 @@ public class ProjectService {
                 })
                 .toList());
 
-        //save project to db
+        // save project to db
         projectRepository.save(project);
 
-        //null check to prevent worst case null pointer exception, then send a kafka event to scan against Deps.dev API
+        // null check to prevent worst case null pointer exception, then send a kafka event to scan against Deps.dev API
         if (project.getDependencies() != null) {
             List<DependencyDto> dependencyList = project.getDependencies()
                     .stream()
                     .map(dependency -> modelMapper.map(dependency, DependencyDto.class))
                     .toList();
-
             VulnScanEvent vulnScanEvent = new VulnScanEvent(userEmail, modelMapper.map(project, ProjectResponse.class), dependencyList);
             kafkaTemplate.send("project-vuln-scan-topic", vulnScanEvent);
         }
 
-        //return with project successfully created
+        // return with project successfully created
         UserProjectResponse userProjectResponse = modelMapper.map(project, UserProjectResponse.class);
         vulnerableDependencyCount(userProjectResponse);
         return userProjectResponse;
     }
 
 
+    /**
+     * Updates the scanning schedule for a project.
+     *
+     * @param projectId         The ID of the project to update.
+     * @param scanUpdateRequest The request containing updated scan configuration.
+     * @return The response indicating the updated scan configuration for the project.
+     * @throws NoUserProjectsException If no project is found with the provided ID.
+     */
     public ScanUpdateResponse updateProjectScheduledScan(String projectId, ScanUpdateRequest scanUpdateRequest) {
         Optional<ProjectEntity> userProjectOptional = projectRepository.findById(projectId);
         boolean newWeeklyScanned = scanUpdateRequest.isWeeklyScanned();
@@ -212,10 +221,6 @@ public class ProjectService {
 
         if (newWeeklyScanned) {
             newDailyScanned = false;
-        }
-
-        if (newDailyScanned) {
-            newWeeklyScanned = false;
         }
 
         userProject.setWeeklyScanned(newWeeklyScanned);
@@ -267,7 +272,7 @@ public class ProjectService {
      */
     public DeleteResponse deleteUserProject(String projectId) {
         ProjectEntity project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new NoProjectByIdException("Project by that ID does not exist!") );
+                .orElseThrow(() -> new NoProjectByIdException("Project by that ID does not exist!"));
 
         emailAuthorisationCheck(project);
         projectRepository.deleteById(projectId);

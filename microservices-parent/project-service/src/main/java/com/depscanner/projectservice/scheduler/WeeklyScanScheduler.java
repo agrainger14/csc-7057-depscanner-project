@@ -14,6 +14,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * Component class responsible for scheduling weekly vulnerability scans for projects.
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -22,6 +25,10 @@ public class WeeklyScanScheduler {
     private final ModelMapper modelMapper;
     private final KafkaTemplate<String, VulnScanEvent> kafkaTemplate;
 
+    /**
+     * Scheduled method to initiate weekly vulnerability scans for eligible projects.
+     * Runs weekly at 2:00 AM (Europe/London timezone).
+     */
     @Scheduled(cron = "0 0 2 ? * MON", zone = "Europe/London")
     public void scanWeeklyProjects() {
         log.info("WEEKLY SCHEDULER BEGUN");

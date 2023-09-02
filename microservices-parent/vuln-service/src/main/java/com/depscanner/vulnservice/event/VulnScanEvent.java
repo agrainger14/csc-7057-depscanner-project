@@ -8,6 +8,10 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * VulnScanEvent to send to the notification-service via Kafka Event.
+ * Sends user email to notified user, along with project and dependency details.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -3,10 +3,16 @@ package com.depscanner.vulnservice.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
+/**
+ * Represents a related open-source dependency entity, including its unique identifier,
+ * associated version, bundled status, relation and a list of errors.
+ *
+ * This entity class is used to model related dependencies, where each related dependency
+ * may be associated with a specific version and includes information about bundling,
+ * relationship and any errors if applicable.
+ */
 @Entity
 @Builder
 @NoArgsConstructor

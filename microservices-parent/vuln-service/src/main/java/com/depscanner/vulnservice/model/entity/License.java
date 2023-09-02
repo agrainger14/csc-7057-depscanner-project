@@ -3,6 +3,11 @@ package com.depscanner.vulnservice.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+/**
+ * Represents a software license, including license information.
+ *
+ * This entity class stores information about a software license, such as the license terms.
+ */
 @Entity
 @Builder
 @NoArgsConstructor

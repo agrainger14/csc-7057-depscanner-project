@@ -26,10 +26,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <OidcProvider configuration={configuration}>
       <BrowserRouter>
         <ThemeProvider theme={theme}>
-          <CssBaseline  />
+          <CssBaseline/>
             <App />
         </ThemeProvider>
       </BrowserRouter>
     </OidcProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
 )

@@ -1,7 +1,13 @@
 package com.depscanner.vulnservice.model.data.getDependencies;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+/**
+ * DTO representing an edge for plotting a node graph.
+ */
 @Data
 @AllArgsConstructor
 @Builder

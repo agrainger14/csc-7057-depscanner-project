@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * Data class representing a response containing information about a user project.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -6,6 +6,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
+/**
+ * The main entry point for the UploadService application.
+ * This class runs the Spring Boot application, enabling discovery client functionality
+ * and providing OpenAPI documentation for the upload-service API.
+ * @see SpringBootApplication
+ * @see EnableDiscoveryClient
+ * @see OpenAPIDefinition
+ */
 @SpringBootApplication
 @EnableDiscoveryClient
 @OpenAPIDefinition(info =

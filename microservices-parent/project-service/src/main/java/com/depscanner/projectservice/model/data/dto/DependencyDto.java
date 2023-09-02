@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO representing an open-source software dependency.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
