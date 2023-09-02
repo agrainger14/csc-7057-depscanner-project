@@ -36,6 +36,7 @@ _Docker Compose_
 cd microservices-parent
 docker-compose up --build -d
 ```
+the API is accessed on http://localhost:8080
 
 _DepScanner UI_
 
@@ -44,4 +45,5 @@ cd depscanner-ui
 npm i
 npm run dev
 ```
+The UI is accessed on http://localhost:5173
 
