@@ -36,7 +36,8 @@ _Docker Compose_
 cd microservices-parent
 docker-compose up --build -d
 ```
-the API is accessed on http://localhost:8080
+the API is accessed on http://localhost:8080, the keycloak realm is included and will be automatically imported on container build.
+To use the notification service and configure keycloak password reset, a valid email user/password config is required. This project used gmail as an example notification service.
 
 _DepScanner UI_
 
