@@ -48,7 +48,7 @@ const Project = () => {
     <OidcSecure>
       <Box sx={{minHeight: '100vh'}}>
         <Header/>
-          {isLoading ? (<LoadingSpinner/>) : (<ProjectContainer project={project}/>)}
+        {isLoading ? (<LoadingSpinner/>) : (<ProjectContainer project={project} />)}
       </Box>
       <Footer/>
     </OidcSecure>

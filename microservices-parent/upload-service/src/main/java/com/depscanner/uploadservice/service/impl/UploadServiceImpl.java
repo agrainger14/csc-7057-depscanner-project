@@ -61,10 +61,8 @@ public class UploadServiceImpl implements UploadService {
      */
     @Override
     public List<DependencyResponse> getParsedDependencyList(Set<DependencyEntity> dependencies) {
-        List<DependencyResponse> dependencyDtoList = dependencies.stream()
+        return dependencies.stream()
                 .map(dependency -> modelMapper.map(dependency, DependencyResponse.class))
                 .toList();
-
-        return dependencyDtoList;
     }
 }

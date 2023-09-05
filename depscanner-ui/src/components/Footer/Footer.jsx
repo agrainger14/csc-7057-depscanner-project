@@ -4,7 +4,6 @@ import styled from '@emotion/styled'
 import GitHubIcon from '../../assets/background/iconmonstr-github-1.svg';
 import DepsDevIcon from '../../assets/background/svgviewer-output.svg';
 
-
 const PageContainer = styled(Box)({
   display: 'flex',
   flexDirection: 'column',
@@ -44,27 +43,29 @@ const Links = styled(Box)({
 const Footer = () => {
   return (
     <PageContainer>
-        <HomeFooterBox>
-          <HomeFooter>
-            <Links>
-              <Link href='https://github.com/advisories'>
-                <img src={GitHubIcon} height={24} width={24} style={{marginRight: '16px'}} alt="GitHubIcon" />
-              </Link>
-              <Link href='https://deps.dev'>
-                <img src={DepsDevIcon} height={24} width={24} style={{marginRight: '16px'}} alt="DepsDevIcon" />
-              </Link>
-            </Links>
-            <Box>
+      <HomeFooterBox>
+        <HomeFooter>
+          <Links>
+            <Link href='https://github.com/advisories'>
+              <img src={GitHubIcon} height={24} width={24} style={{marginRight: '16px'}} alt="GitHubIcon" />
+            </Link>
+            <Link href='https://deps.dev'>
+              <img src={DepsDevIcon} height={24} width={24} style={{marginRight: '16px'}} alt="DepsDevIcon" />
+            </Link>
+          </Links>
+          <Box>
             <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end'}}>
-              <Typography variant="overline">DEPSCANNER, {`${new Date().getFullYear()}`}.</Typography>
+              <Typography variant="overline">
+                DEPSCANNER, {`${new Date().getFullYear()}`}.
+              </Typography>
               <Box>
                 <Typography style={{fontSize:'14px'}} variant='body1'>
                 All data obtained from the "Open Source Insights Project" by Google.
                 </Typography>
               </Box>
-              </Box>
             </Box>
-          </HomeFooter>
+          </Box>
+        </HomeFooter>
       </HomeFooterBox>
     </PageContainer>
   )

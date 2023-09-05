@@ -8,9 +8,9 @@ import { OidcSecure } from "@axa-fr/react-oidc";
 const Dashboard = () => {
   return (
     <OidcSecure>
-      <Box sx={{minHeight: '100vh'}}>
-        <Header/>
-          <Tabs/>
+      <Box sx={{ minHeight: '100vh' }}>
+        <Header />
+          <Tabs />
       </Box>
       <Footer />
     </OidcSecure>

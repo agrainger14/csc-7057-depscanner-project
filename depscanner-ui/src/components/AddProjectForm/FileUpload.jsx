@@ -28,7 +28,7 @@ const FileUpload = ({ setActiveStep, setProjectDependencies, setEnableNext }) =>
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 3, minHeight: '70vh'}}>
@@ -57,37 +57,38 @@ const FileUpload = ({ setActiveStep, setProjectDependencies, setEnableNext }) =>
           >
             {isLoading ? (
               <CircularProgress color="primary" />
-            ) : (
-              <Button sx={{ boxShadow: 4 }} variant="contained" component="label">
-                <AddCircleOutlinedIcon style={{ fontSize: '2rem' }} />
-                <Typography sx={{ ml: 1 }}>Upload</Typography>
-                <input
-                  type="file"
-                  onChange={handleFileChange}
-                  style={{ display: 'none' }}
-                />
-              </Button>
-            )}
-            <Typography
-              sx={{ mt: 2 }}
-              component="h1"
-              variant="h5"
-              align="center"
-              ref={errRef}
-              className={errMessage ? 'errmsg' : 'offscreen'}
-              aria-live="assertive"
-            >
-              {errMessage ? errMessage : ''}
-            </Typography>
-            <Typography variant="subtitle1" align="center" sx={{ mt: 2, fontWeight: 700 }}>
-              Current supported build tool files:
-            </Typography>
-            <Typography variant="subtitle3" align="center">
-              pom.xml (MAVEN)
-            </Typography>
-            <Typography variant="subtitle3" align="center">
-              package.json (NPM)
-            </Typography>
+              ) : (
+                <Button sx={{ boxShadow: 4 }} variant="contained" component="label">
+                  <AddCircleOutlinedIcon style={{ fontSize: '2rem' }} />
+                  <Typography sx={{ ml: 1 }}>Upload</Typography>
+                  <input
+                    type="file"
+                    onChange={handleFileChange}
+                    style={{ display: 'none' }}
+                  />
+                </Button>
+              )
+            }
+              <Typography
+                sx={{ mt: 2 }}
+                component="h1"
+                variant="h5"
+                align="center"
+                ref={errRef}
+                className={errMessage ? 'errmsg' : 'offscreen'}
+                aria-live="assertive"
+              >
+                {errMessage ? errMessage : ''}
+              </Typography>
+              <Typography variant="subtitle1" align="center" sx={{ mt: 2, fontWeight: 700 }}>
+                Current supported build tool files:
+              </Typography>
+              <Typography variant="subtitle3" align="center">
+                pom.xml (MAVEN)
+              </Typography>
+              <Typography variant="subtitle3" align="center">
+                package.json (NPM)
+              </Typography>
           </Box>
         </Paper>
       </Box>

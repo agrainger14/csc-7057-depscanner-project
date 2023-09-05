@@ -5,7 +5,7 @@ function DashboardRedirect() {
     const navigate = useNavigate();
   
     React.useEffect(() => {
-      navigate('/dashboard/projects');
+      return () => navigate('/dashboard/projects');
     }, [navigate]);
 }
 

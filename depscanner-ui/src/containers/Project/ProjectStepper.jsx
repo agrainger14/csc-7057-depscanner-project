@@ -30,8 +30,8 @@ export default function ProjectStepper() {
   const [projectSubmitted, setProjectSubmitted] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const [projectName, setProjectName] = React.useState(null);
-  const [projectDescription, setProjectDescription] = React.useState(null);
+  const [projectName, setProjectName] = React.useState("");
+  const [projectDescription, setProjectDescription] = React.useState("");
   const [projectDependencies, setProjectDependencies] = React.useState(null);
   const [scanFrequency, setScanFrequency] = React.useState(null);
   const [dailyScanned, setDailyScanned] = React.useState(false);
@@ -42,6 +42,7 @@ export default function ProjectStepper() {
 
   React.useEffect(() => {
     handleScanFrequency();
+
     if (activeStep === steps.length && !projectSubmitted) {
       const submitProject = async () => {
         const controller = new AbortController();
@@ -80,7 +81,9 @@ export default function ProjectStepper() {
         }
         return () => controller.abort();
       }
+
       submitProject();
+      
     }
   }, [activeStep, scanFrequency]);
 

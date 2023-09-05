@@ -2,7 +2,7 @@ import { Typography } from "@mui/material";
 import React from "react";
 
 const Title = ({ variant = "h6", sx = {}, children, ...props }) => {
-  const _component =
+  const component =
     typeof variant !== "object"
       ? variant
       : variant.xl ||
@@ -31,7 +31,7 @@ const Title = ({ variant = "h6", sx = {}, children, ...props }) => {
         typography: typeof _variantStyles === "object" && _variantStyles,
         fontWeight: `${sx.fontWeight || 600}!important`,
       }}
-      component={_component}
+      component={component}
       {...props}
     >
       {children}

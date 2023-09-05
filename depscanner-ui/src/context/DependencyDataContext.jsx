@@ -33,8 +33,8 @@ export const DependencyDataProvider = ({ children }) => {
             console.log(res.data);
             setDependencyData(res.data);
         } catch (err) {
-          navigate('/404');
           console.log(err);
+          navigate('/404');
         } finally {
           setIsLoading(false);
         }

@@ -71,105 +71,104 @@ const Header = () => {
                 justifyContent: 'center',
                 }}
             >
-
                 <Security/>
                 <Link to="/" style={{ textDecoration: 'none', color: 'inherit'}}>
                     <AppbarLogo>
                         DEPSCANNER
                     </AppbarLogo>
                 </Link>
-      </Box>
-      <HomeLinksBox>
-      <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
-              sx={{
-                display: { xs: 'block', md: 'none' },
-              }}
-            >
-            <MenuItem onClick={handleCloseNavMenu}>
-            <Link to="/about" style={{ textDecoration: 'none', color: 'inherit'}}>
-                <Typography sx={{fontWeight: 700, ml:1}}>
-                    About
-                </Typography>
-            </Link>
-            </MenuItem>
-            <MenuItem onClick={handleCloseNavMenu}>
-            <Link to="/dashboard" style={{ textDecoration: 'none', color: 'inherit'}}>
-                <Typography sx={{fontWeight: 700, ml:1}}>
-                    Dashboard
-                </Typography>
-            </Link>
-            </MenuItem>
-            {isAuthenticated ? (
-                <Button sx={{borderRadius: '25px', pt:1.5, pb:1.5, pl:3, pr:3 }}>
-                <Typography onClick={() => logout("http://localhost:5173")} sx={{fontWeight: 700}}>
-                    Logout
-                </Typography>
-                </Button>
-            ) : (
-                <Button sx={{borderRadius: '25px', pt:1.5, pb:1.5, pl:3, pr:3 }}>
-                <Typography onClick={() => login("/dashboard")} sx={{fontWeight: 700}}>
-                    Login
-                </Typography>
-                </Button>
-            )}
-            </Menu>
-          </Box>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-          <MenuItem onClick={handleCloseNavMenu}>
-            <Link to="/about" style={{ textDecoration: 'none', color: 'inherit'}}>
-                <Typography sx={{fontWeight: 700}}>
-                    About
-                </Typography>
-            </Link>
-            </MenuItem>
-            <MenuItem onClick={handleCloseNavMenu}>
-            <Link to="/dashboard" style={{ textDecoration: 'none', color: 'inherit'}}>
-                <Typography sx={{fontWeight: 700}}>
-                    Dashboard
-                </Typography>
-            </Link>
-            </MenuItem>
-            {isAuthenticated ? (
-               <Button variant="contained" sx={{borderRadius: '25px', pt:1.5, pb:1.5, pl:3, pr:3, backgroundColor:'#003375'}}>
-                <Typography onClick={() => logout("http://localhost:5173")} sx={{fontWeight: 700}}>
-                    Logout
-                </Typography>
-                </Button>
-            ) : (
-                <Button variant="contained" sx={{borderRadius: '25px', pt:1.5, pb:1.5, pl:3, pr:3, backgroundColor:'#003375'}}>
-                <Typography onClick={() => login("/dashboard")} sx={{fontWeight: 700}}>
-                    Login
-                </Typography>
-                </Button>
-            )}
-          </Box>
-    </HomeLinksBox>
-    </Toolbar>
-  </Appbar>
+            </Box>
+            <HomeLinksBox>
+                <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+                    <IconButton
+                        size="large"
+                        aria-label="account of current user"
+                        aria-controls="menu-appbar"
+                        aria-haspopup="true"
+                        onClick={handleOpenNavMenu}
+                        color="inherit"
+                    >
+                        <MenuIcon />
+                    </IconButton>
+                    <Menu
+                        id="menu-appbar"
+                        anchorEl={anchorElNav}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                        }}
+                        keepMounted
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'left',
+                        }}
+                        open={Boolean(anchorElNav)}
+                        onClose={handleCloseNavMenu}
+                        sx={{
+                            display: { xs: 'block', md: 'none' },
+                        }}
+                    >
+                        <MenuItem onClick={handleCloseNavMenu}>
+                            <Link to="/about" style={{ textDecoration: 'none', color: 'inherit'}}>
+                                <Typography sx={{fontWeight: 700, ml:1}}>
+                                    About
+                                </Typography>
+                            </Link>
+                        </MenuItem>
+                        <MenuItem onClick={handleCloseNavMenu}>
+                            <Link to="/dashboard" style={{ textDecoration: 'none', color: 'inherit'}}>
+                                <Typography sx={{fontWeight: 700, ml:1}}>
+                                    Dashboard
+                                </Typography>
+                            </Link>
+                        </MenuItem>
+                        {isAuthenticated ? (
+                            <Button sx={{borderRadius: '25px', pt:1.5, pb:1.5, pl:3, pr:3 }}>
+                            <Typography onClick={() => logout("http://localhost:5173")} sx={{fontWeight: 700}}>
+                                Logout
+                            </Typography>
+                            </Button>
+                        ) : (
+                            <Button sx={{borderRadius: '25px', pt:1.5, pb:1.5, pl:3, pr:3 }}>
+                            <Typography onClick={() => login("/dashboard")} sx={{fontWeight: 700}}>
+                                Login
+                            </Typography>
+                            </Button>
+                        )}
+                    </Menu>
+                </Box>
+                <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+                    <MenuItem onClick={handleCloseNavMenu}>
+                        <Link to="/about" style={{ textDecoration: 'none', color: 'inherit'}}>
+                            <Typography sx={{fontWeight: 700}}>
+                                About
+                            </Typography>
+                        </Link>
+                    </MenuItem>
+                    <MenuItem onClick={handleCloseNavMenu}>
+                        <Link to="/dashboard" style={{ textDecoration: 'none', color: 'inherit'}}>
+                            <Typography sx={{fontWeight: 700}}>
+                                Dashboard
+                            </Typography>
+                        </Link>
+                    </MenuItem>
+                    {isAuthenticated ? (
+                        <Button variant="contained" sx={{borderRadius: '25px', pt:1.5, pb:1.5, pl:3, pr:3, backgroundColor:'#003375'}}>
+                            <Typography onClick={() => logout("http://localhost:5173")} sx={{fontWeight: 700}}>
+                                Logout
+                            </Typography>
+                        </Button>
+                    ) : (
+                        <Button variant="contained" sx={{borderRadius: '25px', pt:1.5, pb:1.5, pl:3, pr:3, backgroundColor:'#003375'}}>
+                            <Typography onClick={() => login("/dashboard")} sx={{fontWeight: 700}}>
+                                Login
+                            </Typography>
+                        </Button>
+                    )}
+                </Box>
+            </HomeLinksBox>
+        </Toolbar>
+    </Appbar>
   )
 }
 

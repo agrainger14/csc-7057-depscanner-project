@@ -81,7 +81,6 @@ public class VulnScanListener {
 
             if (dependencyVersionData != null && !dependencyVersionData.getAdvisoryKeys().isEmpty()) {
                 addVulnDependency(currentDependency, vulnDependencyList, dependencyVersionData);
-                // Any vulnerabilities in this method all affect the "parent" dependency.
             }
 
             if (dependencies.contains(currentDependency)) {

@@ -26,10 +26,10 @@ public class WeeklyScanScheduler {
     private final KafkaTemplate<String, VulnScanEvent> kafkaTemplate;
 
     /**
-     * Scheduled method to initiate weekly vulnerability scans for eligible projects.
+     * Scheduled method to initiate weekly vulnerability scans for set projects.
      * Runs weekly at 2:00 AM (Europe/London timezone).
      */
-    @Scheduled(cron = "0 0 2 ? * MON", zone = "Europe/London")
+    @Scheduled(cron = "0 0 2 * * *", zone = "Europe/London")
     public void scanWeeklyProjects() {
         log.info("WEEKLY SCHEDULER BEGUN");
         List<ProjectEntity> dailyProjects = projectRepository.findByIsWeeklyScannedTrue();

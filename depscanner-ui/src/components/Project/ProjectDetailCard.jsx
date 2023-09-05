@@ -61,7 +61,7 @@ const ProjectCard = ({ project }) => {
               </Typography>
             </Link>
             <Box sx={{zIndex:2, position: 'relative'}}>
-              <Divider sx={{mb:1, mt:1}}/>
+              <Divider sx={{mb:1, mt:1}} />
               <Typography variant="body2" color="textSecondary">
                 {project?.description} 
               </Typography>
@@ -73,10 +73,10 @@ const ProjectCard = ({ project }) => {
                 Vulnerable Dependencies Detected: {project.vulnerableDependenciesCount}
               </Typography>
               <Box sx={{display:'flex', flexDirection:'row'}}>
-              <Typography variant="body2" color="textSecondary" sx={{mt:1}}>
-                Scanning Frequency: {project.weeklyScanned ? "Weekly" : project.dailyScanned ? "Daily" : "None"}
-              </Typography>
-              <UpdateScanModal 
+                <Typography variant="body2" color="textSecondary" sx={{mt:1}}>
+                  Scanning Frequency: {project.weeklyScanned ? "Weekly" : project.dailyScanned ? "Daily" : "None"}
+                </Typography>
+                <UpdateScanModal 
                   selectedFrequency={project.weeklyScanned ? "Weekly" : project.dailyScanned ? "Daily" : "None"}
                   projectId={project.id}
                 />
@@ -90,15 +90,25 @@ const ProjectCard = ({ project }) => {
                 title={`Status: ${dependency.isVulnerable ? "Vulnerabilities Detected" : dependency.isVulnerable === null ? "No Information Available" : "No Vulnerabilities Detected"}`}
                 placement="top"
               >
+              {dependency.isVulnerable !== null ? (
                 <Link to={`/dependency/${encodeURIComponent(dependency.name)}/${dependency.system}/${dependency.version}`}>
                   <Chip
-                    sx={{mr: 1, mb:2, ml:1, zIndex: 1, position: 'relative', borderColor: 'black', cursor:'pointer'}}
+                    sx={{mr: 1, mb: 2, ml: 1, zIndex: 1, position: 'relative', borderColor: 'black', cursor: 'pointer'}}
                     key={dependency.id}
                     label={dependency.name + ' (' + dependency.version + ')'}
-                    icon={dependency.isVulnerable ? <ErrorIcon /> : (dependency.isVulnerable === null ? <HelpOutlinedIcon/> : <CheckCircleIcon />)}
-                    color={dependency.isVulnerable ? 'error' : (dependency.isVulnerable === null ? 'warning' : 'primary')}
+                    icon={dependency.isVulnerable ? <ErrorIcon /> : <CheckCircleIcon />}
+                    color={dependency.isVulnerable ? 'error' : 'primary'}
                   />
                 </Link>
+              ) : (
+                <Chip
+                  sx={{mr: 1, mb: 2, ml: 1, zIndex: 1, position: 'relative', borderColor: 'black'}}
+                  key={dependency.id}
+                  label={dependency.name + ' (' + dependency.version + ')'}
+                  icon={<HelpOutlinedIcon />}
+                  color="warning"
+                />
+              )}
               </Tooltip>
             ))}
           </ChipLayout>
@@ -113,7 +123,7 @@ const ProjectCard = ({ project }) => {
           >
             {displayProjectIcons(project.projectType)}
           </Box>
-       </Box>
+        </Box>
       </CardLayout>
     </CardBox>
   );

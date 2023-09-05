@@ -5,21 +5,24 @@ import ScoreCard from './Scorecard';
 const Cvss3ScoreCalculator = ({ score }) => {
     const [cvssScore, setCvssScore] = React.useState(null);
 
+    /**
+     * Calculates the CVSS 3.X Score from a passed in CVSS Vector String 
+     * Specification: https://www.first.org/cvss/v3.1/specification-document
+     * @returns CVSS 3.X Score
+     */
     const calculateScore = () => {
         if (score === 0) {
             return 0;
         }
 
-        const [_, AV, AC, PR, UI, S, C, I, A] = score.split('/');
-
+        const [CVSS, AV, AC, PR, UI, S, C, I, A] = score.split('/');
         const confidentiality = C.split(':')[1] === 'H' ? 0.56 : C.split(':')[1] === 'L' ? 0.22 : 0;
         const integrity = I.split(':')[1] === 'H' ? 0.56 : I.split(':')[1] === 'L' ? 0.22 : 0;
         const availability = A.split(':')[1] === 'H' ? 0.56 : A.split(':')[1] === 'L' ? 0.22 : 0;
-      
-        const BaseScore = 1 - (1 - confidentiality) * (1 - integrity) * (1 - availability);
+        const ISS = 1 - (1 - confidentiality) * (1 - integrity) * (1 - availability);
 
-        const scopeUnchanged = 6.42 * BaseScore;
-        const scopeChanged = 7.52 * (BaseScore - 0.029) - 3.25 * (BaseScore - 0.02);
+        const scopeUnchanged = 6.42 * ISS;
+        const scopeChanged = 7.52 * (ISS - 0.029) - 3.25 * Math.pow((ISS - 0.02), 15);
         const impact = S.split(':')[1] === 'C' ? scopeChanged : scopeUnchanged;
 
         //attack vector
@@ -39,7 +42,7 @@ const Cvss3ScoreCalculator = ({ score }) => {
 
         return impact <= 0
             ? 0
-            : S === 'C'
+            : S.split(':')[1] === 'C'
             ? Math.ceil(Math.min(1.08 * (impact + exploitability), 10) * 10) / 10
             : Math.ceil(Math.min(impact + exploitability, 10) * 10) / 10;
     };

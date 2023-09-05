@@ -11,7 +11,7 @@ import Title from '../../utils/title';
 
 export default function AboutCards() {
   return (
-      <Container disableGutters sx={{mt:4, textAlign: 'center'}}>
+    <Container disableGutters sx={{mt:4, textAlign: 'center'}}>
       <Divider sx={{ mb: 2 }} />
         <Title variant={{ xs: 'h4' }} sx={{ textAlign: 'center'}}>
           HOW DOES DEPSCANNER WORK?
@@ -66,7 +66,7 @@ export default function AboutCards() {
               image={EmailNotification}
               title="EmailNotification"
             />
-            <CardContent sx={{textAlign: 'center'}}>
+            <CardContent sx={{textAlign: "center"}}>
               <Typography gutterBottom variant="h5" alignContent="center">
                 <Looks3Icon/>
               </Typography>
@@ -78,7 +78,7 @@ export default function AboutCards() {
             </CardContent>
           </Card>
         </Grid>
-        <Divider sx={{ mb: 5 }} />
-      </Container>
+      <Divider sx={{ mb: 5 }} />
+    </Container>
   );
 }

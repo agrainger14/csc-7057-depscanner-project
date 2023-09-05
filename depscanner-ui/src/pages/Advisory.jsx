@@ -32,11 +32,11 @@ const Advisory = () => {
     
   return (
     <Box>
-      <Box sx={{minHeight: '100vh'}}>
-        <Header/>
-          {osvData && <OsvData osvData={osvData}/>}
+      <Box sx={{ minHeight: '100vh' }}>
+        <Header />
+          { osvData && <OsvData osvData={osvData} /> }
       </Box>
-      <Footer/>
+      <Footer />
     </Box>
   )
 }

@@ -22,10 +22,10 @@ const UserProjects = () => {
           onPageChange={handlePageChange}
         />
       </>
-    ) : (
-      <NoProjectDataAvailable />
-    )}
-  </Box>
+      ) : (
+        <NoProjectDataAvailable />
+      )}
+    </Box>
   )
 }
 

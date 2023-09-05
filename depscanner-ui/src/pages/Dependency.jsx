@@ -8,13 +8,13 @@ import { DependencyDataProvider } from '../context/DependencyDataContext'
 const Dependency = () => {
   return (
     <Box>
-      <Box sx={{minHeight: '100vh'}}>
-        <Header/>
+      <Box sx={{ minHeight: '100vh' }}>
+        <Header />
           <DependencyDataProvider>
-            <DependencyDetail/>
+            <DependencyDetail />
           </DependencyDataProvider>
       </Box>
-      <Footer/>
+      <Footer />
     </Box>
   )
 }

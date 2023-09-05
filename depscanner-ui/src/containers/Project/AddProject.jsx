@@ -5,7 +5,7 @@ import ProjectStepper from './ProjectStepper'
 const AddProject = () => {
   return (
     <Box>
-        <ProjectStepper/>
+      <ProjectStepper/>
     </Box>
   )
 }

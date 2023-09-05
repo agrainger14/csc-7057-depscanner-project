@@ -44,75 +44,76 @@ const Hero = () => {
 
   return (
     <HomeHero>
-        <HeroContainer>
-            <HeroText>
-                <Typography variant='h6'
-                    sx={{
-                        textAlign: 'center',
-                        color: 'text.secondary',
-                        marginBottom: 1,
-                    }}
-                >
-                    Dependency Insights and Monitoring
-                </Typography>
-                <Typography variant="h1" sx={{textAlign: 'center', marginBottom: '40px'}}>
-                    What is the DepScanner Project?
-                </Typography>
-                <Typography variant='h4' sx={{
-                    textAlign: 'center',
-                    marginBottom: '40px',
-                    color: 'text.secondary',
+      <HeroContainer>
+        <HeroText>
+          <Typography variant='h6'
+            sx={{
+              textAlign: 'center',
+              color: 'text.secondary',
+              marginBottom: 1,
+            }}
+          >
+            Dependency Insights and Monitoring
+          </Typography>
+          <Typography variant="h1" sx={{textAlign: 'center', marginBottom: '40px'}}>
+            What is the DepScanner Project?
+          </Typography>
+          <Typography variant='h4' 
+            sx={{
+              textAlign: 'center',
+              marginBottom: '40px',
+              color: 'text.secondary',
+            }}
+          >
+          A tool designed to monitor your project dependencies and notify you about the latest security vulnerabilities.
+          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              textAlign: 'center',
+            }}
+          > 
+            <Link to="/about">
+              <Button
+                variant="contained"
+                sx={{
+                  paddingTop: '16px',
+                  paddingLeft: '80px',
+                  paddingRight: '80px',
+                  paddingBottom: '16px',
+                  borderRadius: '30px',
+                  backgroundColor: 'black',
+                  '&:hover': {
+                    backgroundColor: '#002958',
+                    borderColor: 'black',
+                  },
                 }}
-            >
-            A tool designed to monitor your project dependencies and notify you about the latest security vulnerabilities.
-            </Typography>
-            <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            textAlign: 'center',
-          }}
-        > 
-        <Link to="/about">
-          <Button
-            variant="contained"
-            sx={{
-              paddingTop: '16px',
-              paddingLeft: '80px',
-              paddingRight: '80px',
-              paddingBottom: '16px',
-              borderRadius: '30px',
-              backgroundColor: 'black',
-              '&:hover': {
-                backgroundColor: '#002958',
+              >
+                LEARN MORE
+              </Button>
+            </Link>
+            <Button onClick={() => login('/dashboard')}
+              variant="outlined"
+              sx={{
+                paddingTop: '16px',
+                paddingLeft: '80px',
+                paddingRight: '80px',
+                paddingBottom: '16px',
+                borderRadius: '30px',
                 borderColor: 'black',
-              },
-            }}
-          >
-            LEARN MORE
-          </Button>
-          </Link>
-          <Button onClick={() => login('/dashboard')}
-            variant="outlined"
-            sx={{
-              paddingTop: '16px',
-              paddingLeft: '80px',
-              paddingRight: '80px',
-              paddingBottom: '16px',
-              borderRadius: '30px',
-              borderColor: 'black',
-              color: 'white',
-              marginLeft: '16px',
-              '&:hover': {
-                backgroundColor: 'black',
-              },
-            }}
-          >
-            LAUNCH
-          </Button>
-        </div>
-            </HeroText>
-        </HeroContainer>
+                color: 'white',
+                marginLeft: '16px',
+                '&:hover': {
+                  backgroundColor: 'black',
+                },
+              }}
+            >
+              LAUNCH
+            </Button>
+          </Box>
+        </HeroText>
+      </HeroContainer>
     </HomeHero>
   )
 }

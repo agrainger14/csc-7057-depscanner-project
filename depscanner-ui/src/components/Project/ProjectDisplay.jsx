@@ -5,7 +5,7 @@ import ProjectDetailCard from '../components/ProjectDetailCard'
 const ProjectDisplay = ({ project }) => {
   return (
     <Box>
-        <ProjectDetailCard key={project.id} project={project} />
+      <ProjectDetailCard key={project.id} project={project} />
     </Box>
   )
 }

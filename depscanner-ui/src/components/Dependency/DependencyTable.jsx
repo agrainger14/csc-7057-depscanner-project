@@ -61,99 +61,99 @@ const DependencyTable = ({ dependencyData }) => {
   const filteredDependencies = dependencyData && stableSort(dependencyData.dependency, getComparator(order, orderBy)).slice().filter(dependency =>
     dependency.versionKey.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     dependency.versionKey.version.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    dependency.relation.toLowerCase().includes(searchTerm.toLowerCase())
+    dependency.relation.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    dependency.licenses.some(license => license.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
-      <Container maxWidth={'xl'} sx={{mt:2, mb:2}}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              sx={{
-                width: '100%',
-                textAlign: 'center',
-              }}
-              label="Filter dependencies by name, license, relation, security advisory etc."
-              variant="outlined"
-              value={searchTerm}
-              onChange={handleSearch}
-            />
-          </Grid>
-          <Grid item xs={12}>
+    <Container maxWidth={'xl'} sx={{mt:2, mb:2}}>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <TextField
+            sx={{
+              width: '100%',
+              textAlign: 'center',
+            }}
+            label="Filter dependencies by name, license, relation, security advisory etc."
+            variant="outlined"
+            value={searchTerm}
+            onChange={handleSearch}
+          />
+        </Grid>
+        <Grid item xs={12}>
           <TableContainer variant="outlined" component={Paper}>
-          <Table aria-label="dependency">
+            <Table aria-label="dependency">
               <TableHead>
                 <TableRow>
                   <TableCell>
-                  <TableSortLabel
-                    active={orderBy === 'versionKey.name'}
-                     direction={orderBy === 'versionKey.name' ? order : 'asc'}
+                    <TableSortLabel
+                      active={orderBy === 'versionKey.name'}
+                      direction={orderBy === 'versionKey.name' ? order : 'asc'}
                       onClick={() => handleSort('versionKey.name')}
-                  >
+                    >
                       Dependency
                     </TableSortLabel>
                   </TableCell>
                   <TableCell>
-                  <TableSortLabel
-                    active={orderBy === 'advisoryDetail'}
-                     direction={orderBy === 'advisoryDetail' ? order : 'asc'}
-                      onClick={() => handleSort('advisoryDetail')}
-                  >
+                    <TableSortLabel
+                      active={orderBy === 'advisoryDetail'}
+                      direction={orderBy === 'advisoryDetail' ? order : 'asc'}
+                        onClick={() => handleSort('advisoryDetail')}
+                    >
                       Security Advisories
                     </TableSortLabel>
                   </TableCell>
                   <Hidden smDown>
-                  <TableCell>
-                  <TableSortLabel
-                    active={orderBy === 'relation'}
-                     direction={orderBy === 'relation' ? order : 'asc'}
-                      onClick={() => handleSort('relation')}
-                  >
-                      Relation
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell>
-                  <TableSortLabel
-                    active={orderBy === 'licenses'}
-                     direction={orderBy === 'licenses' ? order : 'asc'}
-                      onClick={() => handleSort('licenses')}
-                  >
-                      Licenses
-                    </TableSortLabel>
-                  </TableCell>
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === 'relation'}
+                        direction={orderBy === 'relation' ? order : 'asc'}
+                        onClick={() => handleSort('relation')}
+                      >
+                        Relation
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === 'licenses'}
+                        direction={orderBy === 'licenses' ? order : 'asc'}
+                        onClick={() => handleSort('licenses')}
+                      >
+                        Licenses
+                      </TableSortLabel>
+                    </TableCell>
                   </Hidden>
                 </TableRow>
               </TableHead>
               <TableBody>
-              {filteredDependencies && 
-                filteredDependencies.map((dependency, index) => (
-                <TableRow key={index}>
-                    <TableCell>
-                    <Link href={`/dependency/${encodeURIComponent(dependency.versionKey.name)}/${dependency.versionKey.system}/${dependency.versionKey.version}`}>
-                      <Typography variant="subtitle1">
-                    {dependency.versionKey.name}
-                    </Typography>
-                    </Link>
-                    <Typography variant="subtitle2" color="text.secondary">
-                    {dependency.versionKey.version}
-                    </Typography>
-                    </TableCell>
-                    <Hidden smDown>
-                    <TableCell><Button sx={{color:'red'}}>{dependency.advisoryDetail.length > 0 && dependency.advisoryDetail.length}</Button></TableCell>
-                    <TableCell>{dependency.relation}</TableCell>
-                    <TableCell>{dependency.licenses.join(', ')}</TableCell>
-                    </Hidden>
-                  </TableRow>
-                ))
-              }
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
+                {filteredDependencies && 
+                  filteredDependencies.map((dependency, index) => (
+                  <TableRow key={index}>
+                      <TableCell>
+                      <Link href={`/dependency/${encodeURIComponent(dependency.versionKey.name)}/${dependency.versionKey.system}/${dependency.versionKey.version}`}>
+                        <Typography variant="subtitle1">
+                      {dependency.versionKey.name}
+                      </Typography>
+                      </Link>
+                      <Typography variant="subtitle2" color="text.secondary">
+                      {dependency.versionKey.version}
+                      </Typography>
+                      </TableCell>
+                      <Hidden smDown>
+                      <TableCell><Button sx={{color:'red'}}>{dependency.advisoryDetail.length > 0 && dependency.advisoryDetail.length}</Button></TableCell>
+                      <TableCell>{dependency.relation}</TableCell>
+                      <TableCell>{dependency.licenses.join(', ')}</TableCell>
+                      </Hidden>
+                    </TableRow>
+                  ))
+                }
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Grid>
-      </Container>
-      );
-      
+      </Grid>
+    </Container>
+  ); 
 }
 
 export default DependencyTable

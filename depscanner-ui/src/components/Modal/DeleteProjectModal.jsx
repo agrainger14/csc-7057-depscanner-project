@@ -4,17 +4,17 @@ import ClearIcon from '@mui/icons-material/Clear';
 import ProjectDataContext from '../../context/ProjectDataContext';
 
 const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-    textAlign: 'center'
-  };
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+  textAlign: 'center'
+};
 
 const DeleteProjectModal = ({ id }) => {
   const { handleDelete, successDeleteProject, setSuccessDeleteProject } = React.useContext(ProjectDataContext);
@@ -30,18 +30,18 @@ const DeleteProjectModal = ({ id }) => {
 
   return (
     <>
-        <IconButton sx={{
-            position: 'absolute',
-            top: 0,
-            right: 0,
+      <IconButton 
+        sx={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
         }}
         onClick={handleModalOpen}
         aria-label="Delete"
-        >
-            <ClearIcon />
-        </IconButton>
-
-        <Modal
+      >
+        <ClearIcon />
+      </IconButton>
+      <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={isOpen}
@@ -63,26 +63,26 @@ const DeleteProjectModal = ({ id }) => {
               This project will be permanently deleted! Would you like to continue?
             </Typography>
             <Box sx={{mt:2}}>
-            <Button onClick={() => handleDelete(id)}>
-                Yes
-            </Button>
-            <Button onClick={handleModalClose}>
-                No
-            </Button>
+              <Button onClick={() => handleDelete(id)}>
+                  Yes
+              </Button>
+              <Button onClick={handleModalClose}>
+                  No
+              </Button>
             </Box>
           </Box>
         </Fade>
-        </Modal>
-        <Snackbar
+      </Modal>
+      <Snackbar
         open={successDeleteProject}
         autoHideDuration={3000}
         onClose={() => setSuccessDeleteProject(false)}
-        >
-          <Alert onClose={() => setSuccessDeleteProject(false)} severity="success" sx={{ width: '100%' }}>
-            Project successfully deleted!
-          </Alert>
-        </Snackbar>
-  </>
+      >
+        <Alert onClose={() => setSuccessDeleteProject(false)} severity="success" sx={{ width: '100%' }}>
+          Project successfully deleted!
+        </Alert>
+      </Snackbar>
+    </>
   )
 }
 

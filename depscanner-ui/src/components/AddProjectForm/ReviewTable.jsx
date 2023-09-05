@@ -154,22 +154,22 @@ const ReviewTable = ({ projectDependencies, setProjectDependencies, setEnableNex
                                 </TableCell>
                                 }
                                 <TableCell>
-                                <Tooltip
-                                    title="Project must have at least one dependency"
-                                    placement="top"
-                                    disableHoverListener={projectDependencies.length !== 1}
-                                >
-                                    <span>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={() => handleDeleteDependency(index)}
-                                    disabled={projectDependencies.length === 1}
-                                >
-                                    Delete
-                                </Button>
-                                </span>
-                                </Tooltip>
+                                    <Tooltip
+                                        title="Project must have at least one dependency"
+                                        placement="top"
+                                        disableHoverListener={projectDependencies.length !== 1}
+                                    >
+                                        <span>
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+                                                onClick={() => handleDeleteDependency(index)}
+                                                disabled={projectDependencies.length === 1}
+                                            >
+                                                Delete
+                                            </Button>
+                                        </span>
+                                    </Tooltip>
                                 </TableCell>
                             </TableRow>
                         )

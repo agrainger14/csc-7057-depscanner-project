@@ -55,7 +55,9 @@ const ScoreCard = ({ cvss3Score }) => {
       }}
       disabled
     >
-      <Typography variant="body1">{text}</Typography>
+      <Typography variant="body1">
+        {text}
+      </Typography>
     </Box>
   );
 };

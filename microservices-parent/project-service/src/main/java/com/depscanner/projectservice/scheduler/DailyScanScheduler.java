@@ -26,10 +26,10 @@ public class DailyScanScheduler {
     private final KafkaTemplate<String, VulnScanEvent> kafkaTemplate;
 
     /**
-     * Scheduled method to initiate daily vulnerability scans for eligible projects.
+     * Scheduled method to initiate daily vulnerability scans for set projects.
      * Runs daily at 2:00 AM (Europe/London timezone).
      */
-    @Scheduled(cron = "0 0 2 * * ?", zone = "Europe/London")
+    @Scheduled(cron = "0 0 2 * * MON", zone = "Europe/London")
     public void scanDailyProjects() {
         log.info("DAILY SCHEDULER BEGUN");
 

@@ -9,11 +9,11 @@ import Footer from '../components/Footer/Footer'
 const Home = () => {
   return (
     <Box sx={{minHeight: '100vh'}}>
-      <Header/>
-      <Hero/>
-      <LowerHero/>
-      <Information/>
-      <Footer/>
+      <Header />
+      <Hero />
+      <LowerHero />
+      <Information />
+      <Footer />
     </Box>
   )
 }

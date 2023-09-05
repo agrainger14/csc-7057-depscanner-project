@@ -46,7 +46,7 @@ const SSFScoreCard = ({ dependencyData }) => {
                     <Typography variant="h4" sx={{ ml: 2, mr: 2, mt: 2 }}>
                         Open SSF Score
                     </Typography>
-                    <Divider sx={{ ml:2, mr:2 }}/>
+                    <Divider sx={{ ml:2, mr:2 }} />
                     <Typography variant="body2" sx={{ ml: 2, mr: 2, mt:1 }}>
                         The Open Source Security Foundation (OpenSSF) is a collaborative effort spanning various industries, aimed at enhancing the security of open source software (OSS).
                         The Scorecard is a tool provided by OpenSSF that offers security health metrics for open source projects.

@@ -8,13 +8,13 @@ import AboutContainer from '../containers/About/AboutContainer';
 const About = () => {
   return (
     <Box>
-      <Box sx={{minHeight: '100vh'}}>
-          <Header/>
-          <Box sx={{background: `url(${AboutBackground})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '125vh'}}>
-              <AboutContainer/>
+      <Box sx={{ minHeight: '100vh' }}>
+          <Header />
+          <Box sx={{ background: `url(${AboutBackground})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '125vh' }}>
+            <AboutContainer />
           </Box>
       </Box>
-      <Footer/>
+      <Footer />
     </Box>
   )
 }

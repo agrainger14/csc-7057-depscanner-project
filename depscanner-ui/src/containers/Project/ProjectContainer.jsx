@@ -1,11 +1,22 @@
 import React from 'react'
-import { Box, Container, List, Typography, ListItem, ListItemText, Chip, Divider, Tooltip } from '@mui/material'
+import { Box, Container, List, Typography, ListItem, ListItemText, Chip, Divider, Tooltip, styled } from '@mui/material'
 import { Link } from 'react-router-dom'
 import Gradient from '../../assets/background/slanted-gradient.svg'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import ErrorIcon from '@mui/icons-material/Error'
 import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined'
 import AppPagination from '../../components/Pagination/AppPagination'
+
+const DisplayContainer = styled(Container)({
+    backgroundColor:'black', 
+    display: 'flex',
+    mt:2,
+    flexDirection: 'column',
+    border: '1px solid white',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    borderRadius: '8px', 
+    minHeight: '100%',
+})
 
 const ProjectContainer = ({ project }) => {
     const [currentPage, setCurrentPage] = React.useState(1);
@@ -20,18 +31,7 @@ const ProjectContainer = ({ project }) => {
   return (
     <Box sx={{background: `url(${Gradient})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '100vh'}}>
         {(project && 
-            <Container maxWidth={'md'} 
-                sx={{
-                    backgroundColor:'background.default', 
-                    display: 'flex',
-                    mt:2,
-                    flexDirection: 'column',
-                    border: '1px solid white',
-                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                    borderRadius: '8px', 
-                    minHeight: '100%',
-                }}
-            >
+            <DisplayContainer maxWidth={'md'}>
                 <Typography variant="h4" gutterBottom sx={{mt:1}}>
                     {project.name}
                 </Typography>
@@ -57,25 +57,22 @@ const ProjectContainer = ({ project }) => {
                     Dependencies:
                 </Typography>
                 <List>
-                    {project.dependencies.slice(startIndex,endIndex).map((dependency) => (
-                        <Link key={dependency.id} to={`/dependency/${encodeURIComponent(dependency.name)}/${dependency.system}/${dependency.version}`} style={{textDecoration:'none', color:'inherit'}}>
-                            <ListItem key={dependency.id}>
-                                <ListItemText
-                                    primary={dependency.name}
-                                    secondary={
-                                    <Typography
-                                        sx={{
-                                        color: dependency.isVulnerable ? 'error.main' : dependency.isVulnerable === null ? 'warning.main' : 'success.main',
-                                        }}
-                                    >
+                    {project.dependencies.slice(startIndex, endIndex).map((dependency) => (
+                        <ListItem key={dependency.id}>
+                            <ListItemText primary={dependency.name}
+                                secondary={
+                                    <Typography sx={{
+                                        color: dependency.isVulnerable ? 'error.main' : dependency.isVulnerable === null ? 'warning.main' : 'success.main'
+                                    }}>
                                         Version: {dependency.version}
                                     </Typography>
-                                    }
-                                />
-                                {dependency.isVulnerable !== null ? (
+                                }
+                            />
+                            {dependency.isVulnerable !== null ? (
+                                <Link key={dependency.id} to={`/dependency/${encodeURIComponent(dependency.name)}/${dependency.system}/${dependency.version}`} style={{textDecoration:'none', color:'inherit'}}>
                                     <Tooltip
                                         key={dependency.id}
-                                        title={`${dependency.isVulnerable ? "This dependency may potentially be unsafe" : "There are no vulnerabilities currently detected for this dependency version"}`}
+                                        title={`${dependency.isVulnerable ? "This dependency may potentially be unsafe. Click for more information." : "There are no vulnerabilities currently detected for this dependency version. Click for more information."}`}
                                         placement="top"
                                     >
                                         <Chip
@@ -85,22 +82,22 @@ const ProjectContainer = ({ project }) => {
                                             sx={{ width: '140px'}}
                                         />
                                     </Tooltip>
+                                </Link>
                                 ) : 
-                                    <Tooltip
+                                <Tooltip
                                     key={dependency.id}
                                     title='There is no data currently available for this dependency, it may be a private dependency or there is currently no data available.'
                                     placement="top"
-                                    >
-                                        <Chip
-                                            icon={<HelpOutlinedIcon/>}
-                                            label={'No data'}
-                                            color={'warning'}
-                                            sx={{ width: '140px'}}
-                                        />
-                                    </Tooltip>
-                                }
-                            </ListItem>
-                        </Link>
+                                >
+                                    <Chip
+                                        icon={<HelpOutlinedIcon/>}
+                                        label={'No data'}
+                                        color={'warning'}
+                                        sx={{ width: '140px'}}
+                                    />
+                                </Tooltip>
+                            }
+                        </ListItem>
                     ))}
                     <AppPagination
                         totalItems={project.dependencies.length}
@@ -109,7 +106,7 @@ const ProjectContainer = ({ project }) => {
                         onPageChange={handlePageChange}
                     />
                 </List>
-            </Container>
+            </DisplayContainer>
         )}
     </Box>
   )
