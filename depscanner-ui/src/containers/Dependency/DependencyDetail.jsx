@@ -25,11 +25,9 @@ const DependencyDetail = () => {
         </Tabs>
       </Box>
       <Box>
-      </Box>
-      <Box>
-      <Typography variant="h3" sx={{ mt: 2, ml: 2, fontWeight: 700, textAlign:'center'}}>
-        {name} | {version} <span style={{ fontSize: '1.2rem' }}>{system}</span>
-      </Typography>
+        <Typography variant="h3" sx={{ mt: 2, ml: 2, fontWeight: 700, textAlign:'center'}}>
+          {name} | {version} <span style={{ fontSize: '1.2rem' }}>{system}</span>
+        </Typography>
       </Box>
       <Divider sx={{ ml: 2, mr: 2 }} />
       {dependencyData ? (selectedTab === 0 && <DependencyOverview dependencyData={dependencyData} setSelectedTab={setSelectedTab} />) : (<LoadingSpinner/>)}

@@ -9,15 +9,11 @@ const SSFScoreCard = ({ dependencyData }) => {
     React.useEffect(() => {
         let isMounted = true;
         const controller = new AbortController();
-
         const links = dependencyData.dependency[0].links;
-
         const SOURCE_REPO = links.find(link => link.label === 'SOURCE_REPO')?.url;
-
         const parts = SOURCE_REPO.split('/');
         const owner = parts[parts.length - 2];
         const repo_name = parts[parts.length - 1].split('.')[0];
-        console.log(parts);
 
         const getScorecard = async () => {
         try {
@@ -25,7 +21,6 @@ const SSFScoreCard = ({ dependencyData }) => {
               signal: controller.signal
             });
                 isMounted && setScoreData(res.data);
-                console.log(res.data);
             } catch (err) {
                 console.log(err);
             }

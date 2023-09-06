@@ -30,8 +30,7 @@ export const DependencyDataProvider = ({ children }) => {
             },
             signal: controller.signal
           });
-            console.log(res.data);
-            setDependencyData(res.data);
+          setDependencyData(res.data);
         } catch (err) {
           console.log(err);
           navigate('/404');
