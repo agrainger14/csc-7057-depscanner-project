@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Service class responsible for managing package data, including reading and fetching package information.
@@ -104,7 +105,7 @@ public class GetPackageService {
             List<Version> updatedVersions = responseDto.getVersions()
                     .stream()
                     .map(version -> mapper.mapToDependencyVersion(version, dependency))
-                    .toList();
+                    .collect(Collectors.toList());
             dependency.setVersions(updatedVersions);
             dependencyRepository.save(dependency);
         }

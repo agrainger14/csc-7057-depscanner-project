@@ -368,7 +368,9 @@ public class Mapper {
                         (dependency.getName(), dependency.getSystem().getSystem(), versionDto.getVersionKey().getVersion());
 
         if (versionOptional.isPresent()) {
-            return versionOptional.get();
+            Version version = versionOptional.get();
+            version.setVersionDetail(mapToVersionDetail(versionDto, version));
+            return version;
         }
 
         Version version = Version.builder()
@@ -394,7 +396,6 @@ public class Mapper {
                 .publishedAt(versionDto.getPublishedAt())
                 .isDefault(Boolean.valueOf(versionDto.getIsDefault()))
                 .build());
-
     }
 
     /**
