@@ -36,7 +36,6 @@ export const ProjectDataProvider = ({ children }) => {
         setProjectData(res.data);
       } catch (err) {
         console.log(err);
-        navigate('/404');
       } finally {
         setIsLoading(false);
       }
